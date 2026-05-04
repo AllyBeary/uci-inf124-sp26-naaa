@@ -1,65 +1,112 @@
-import Image from "next/image";
+"use client";
+
+import { useState, useEffect } from "react";
+import Header from "@/components/Header";
+import Sidebar from "@/components/Sidebar";
+import Calendar from "@/components/Calendar";
 
 export default function Home() {
+  const [selectedPeople, setSelectedPeople] = useState<string[]>(["person1"]);
+  const [currentDate, setCurrentDate] = useState(new Date(2026, 3, 1)); // April 2026
+  const [processedGoogleEvents, setProcessedGoogleEvents] = useState<Array<{
+    dayIndex: number;
+    startHour: number;
+    endHour: number;
+    duration: number;
+    event: {
+      id: string;
+      summary: string;
+    };
+  }>>([]);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [accessToken, setAccessToken] = useState<string | null>(null);
+
+  // Check for stored authentication on mount
+  useEffect(() => {
+    const storedToken = localStorage.getItem("google_access_token");
+    const storedEmail = localStorage.getItem("google_user_email");
+
+    if (storedToken && storedEmail) {
+      setIsLoggedIn(true);
+      setAccessToken(storedToken);
+      fetchGoogleEvents(storedToken, currentDate);
+    }
+  }, []);
+
+  // Fetch Google Calendar events when date changes
+  useEffect(() => {
+    if (isLoggedIn && accessToken) {
+      fetchGoogleEvents(accessToken, currentDate);
+    }
+  }, [currentDate, isLoggedIn, accessToken]);
+
+  const fetchGoogleEvents = async (token: string, date: Date) => {
+    try {
+      // Get week start and end
+      const weekStart = new Date(date);
+      weekStart.setDate(date.getDate() - date.getDay() + 1); // Monday
+      const weekEnd = new Date(weekStart);
+      weekEnd.setDate(weekStart.getDate() + 6); // Sunday
+
+      const timeMin = weekStart.toISOString();
+      const timeMax = weekEnd.toISOString();
+
+      const response = await fetch("/api/google-events", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ accessToken: token, timeMin, timeMax }),
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        setProcessedGoogleEvents(data.events || []);
+      }
+    } catch (error) {
+      console.error("Error fetching Google Calendar events:", error);
+    }
+  };
+
+  const handleAccessTokenChange = (token: string | null) => {
+    setAccessToken(token);
+    if (token) {
+      setIsLoggedIn(true);
+      // Don't call fetchGoogleEvents here - the useEffect will handle it
+    } else {
+      setIsLoggedIn(false);
+      setProcessedGoogleEvents([]);
+    }
+  };
+
+  const handleUserChange = (user: { name: string; email: string } | null) => {
+    if (!user) {
+      setIsLoggedIn(false);
+      setAccessToken(null);
+      setProcessedGoogleEvents([]);
+    }
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
+    <div className="flex flex-col h-screen bg-white">
+      <Header
+        onAccessTokenChange={handleAccessTokenChange}
+        onUserChange={handleUserChange}
+      />
+      <div className="flex flex-1 overflow-hidden">
+        <Sidebar
+          selectedPeople={selectedPeople}
+          onSelectedPeopleChange={setSelectedPeople}
+          currentDate={currentDate}
+          onCurrentDateChange={setCurrentDate}
         />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
-        </div>
-      </main>
+        <Calendar
+          selectedPeople={selectedPeople}
+          currentDate={currentDate}
+          googleEvents={processedGoogleEvents}
+          isLoggedIn={isLoggedIn}
+        />
+      </div>
     </div>
   );
 }
