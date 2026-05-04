@@ -4,6 +4,7 @@ import { FaUserFriends, FaBell } from "react-icons/fa";
 import { BsPersonCircle } from "react-icons/bs";
 import { HiMagnifyingGlass } from "react-icons/hi2";
 
+//Hard coded data (replace later)
 const initialFriends = [
   { 
     name: "Audrey Phung", 
@@ -86,7 +87,7 @@ function SideBar()
             </li>
           ))}
         </ul>
-
+        <div className="border-t border-gray-200 mb-6" />
         {/* Activity */}
         <h2 className="text-lg font-bold text-gray-900 mb-3">Activity</h2>
         <ul className="space-y-4">
@@ -144,9 +145,12 @@ export default function FriendsPage() {
         <div className="flex flex-1">
           <div className="flex-1 p-4 sm:p-6 sm:pl-8">
 
+            {/* Displays Friends */}
             <div className="mb-4">
               <div className="flex items-center justify-between mb-4">
                 <h1 className="text-xl sm:text-2xl font-bold text-gray-900">Friends</h1>
+
+                {/* Add Friends */}
                 <div className="relative">
                   <button
                     onClick={() => setShowModal((v) => !v)}
@@ -207,6 +211,8 @@ export default function FriendsPage() {
                     <p className="font-semibold text-gray-900 truncate">{friend.name}</p>
                     <p className="text-sm text-gray-500 truncate">@{friend.username}</p>
                   </div>
+
+                  {/* Remove Friends (Consider adding some error guard for users) */}
                   <button
                     onClick={() => removeFriend(friend.username)}
                     className="shrink-0 w-20 py-1 border border-gray-400 text-xs text-gray-600 rounded-lg hover:bg-red-50 hover:border-red-300 hover:text-red-500 transition-colors"
@@ -216,7 +222,6 @@ export default function FriendsPage() {
                 </li>
               ))}
             </ul>
-
           </div>
           <SideBar />
         </div>
