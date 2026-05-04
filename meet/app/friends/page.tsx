@@ -42,9 +42,11 @@ const sentRequests = [
 const activity = [
   {
     name: "Ethan Votran",
+    username: "evotran"
   },
   {
     name: "John Doe",
+    username: "username"
   }
 ]
 
@@ -78,9 +80,10 @@ function SideBar()
           {sentRequests.map((req) => (
             <li key={req.username} className="flex items-center gap-2">
               <BsPersonCircle size={28} className="text-gray-500 shrink-0" />
-              <span className="flex-1 text-sm font-medium text-gray-800 truncate">
-                {req.name}
-              </span>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-800 truncate">{req.name}</p>
+                <p className="text-xs text-gray-500 truncate">@{req.username}</p>
+              </div>
               <span className="text-xs w-20 px-4 py-0.5 bg-gray-100 border border-gray-300 text-gray-500 rounded-full">
                 Pending
               </span>
@@ -95,9 +98,10 @@ function SideBar()
             <li key={person.name} className="flex items-start gap-2">
               <BsPersonCircle size={28} className="text-gray-500 shrink-0 mt-0.5" />
               <div>
-                <p className="text-sm text-gray-700">
+                <p className="text-sm text-black">
                   <span className="font-medium">{person.name}</span> sent you a friend request
                 </p>
+                <p className="text-xs text-gray-500 truncate">@{person.username}</p>
                 <div className="flex gap-2 mt-1.5">
                   <button
                     className="text-xs px-4 py-0.5 bg-gray-100 border border-gray-300 text-gray-600 rounded-full hover:bg-green-50 hover:border-green-400 hover:text-green-600 transition-colors"
