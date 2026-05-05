@@ -24,18 +24,7 @@ const initialFriends = [
 const otherUsers = [
   {
     name: "Ziv Hadar",
-    username: "username"
-  }
-];
-
-const sentRequests = [
-  {
-    name: "Anver Chou",
-    username: "anverc"
-  },
-  {
-    name: "Jane Doe",
-    username: "username"
+    username: "zivh"
   }
 ];
 
@@ -46,7 +35,7 @@ const activity = [
   },
   {
     name: "John Doe",
-    username: "username"
+    username: "jd26"
   }
 ]
 
@@ -69,7 +58,7 @@ function NavBar() {
   );
 }
 
-function SideBar()
+function SideBar({ sentRequests }: { sentRequests: { name: string; username: string }[] })
 {
     return (
         <aside className="w-85 shrink-0 border-l border-gray-200 p-6">
@@ -127,6 +116,24 @@ export default function FriendsPage() {
   const [friends, setFriends] = useState(initialFriends);
   const [showModal, setShowModal] = useState(false);
   const [searchValue, setSearchValue] = useState("");
+  const [sentRequests, setSentRequests] = useState([
+    {
+      name: "Anver Chou",
+      username: "anverc"
+    },
+    {
+      name: "Jane Doe",
+      username: "username"
+    }
+  ]);
+
+  const sendFriendRequest = (user: { name: string; username: string }) => {
+    setSentRequests((prev) => {
+      // prevent duplicates
+      if (prev.some((u) => u.username === user.username)) return prev;
+      return [...prev, user];
+    });
+  };
 
   const removeFriend = (username: string) => {
     setFriends((prev) => prev.filter((f) => f.username !== username));
@@ -180,18 +187,26 @@ export default function FriendsPage() {
                         </div>
                         {searchResults.length > 0 && (
                           <ul className="mt-2 space-y-1">
-                            {searchResults.map((user) => (
-                              <li key={user.username} className="flex items-center gap-2 px-2 py-2 rounded-lg bg-gray-100">
-                                <BsPersonCircle size={28} className="text-gray-500 shrink-0" />
-                                <div className="flex-1 min-w-0">
-                                  <p className="text-sm font-semibold text-gray-900 truncate">{user.name}</p>
-                                  <p className="text-xs text-gray-500 truncate">@{user.username}</p>
-                                </div>
-                                <button className="shrink-0 w-15 py-1 border border-gray-400 text-xs text-gray-600 rounded-lg">
-                                  + Add
-                                </button>
-                              </li>
-                            ))}
+                            {searchResults.map((user) => {
+                              const isSent = sentRequests.some((u) => u.username === user.username);
+
+                              return (
+                                <li key={user.username} className="flex items-center gap-2 px-2 py-2 rounded-lg bg-gray-100">
+                                  <BsPersonCircle size={28} className="text-gray-500 shrink-0" />
+                                  <div className="flex-1 min-w-0">
+                                    <p className="text-sm font-semibold text-gray-900 truncate">{user.name}</p>
+                                    <p className="text-xs text-gray-500 truncate">@{user.username}</p>
+                                  </div>
+                                  <button
+                                    onClick={() => sendFriendRequest(user)}
+                                    disabled={isSent}
+                                    className="shrink-0 w-15 py-1 border border-gray-400 text-xs rounded-lg 
+                                      disabled:opacity-50 disabled:cursor-not-allowed"
+                                  >
+                                    {isSent ? "Sent" : "+ Add"}
+                                  </button>
+                                </li>);
+                            })}
                           </ul>
                         )}
                       </div>
@@ -227,7 +242,7 @@ export default function FriendsPage() {
               ))}
             </ul>
           </div>
-          <SideBar />
+          <SideBar sentRequests={sentRequests}/>
         </div>
     </div>
 );}
