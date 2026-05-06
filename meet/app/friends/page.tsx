@@ -43,7 +43,7 @@ const activity = [
 function NavBar() {
   return (
     <header className="w-full border-b border-gray-200 bg-white px-4 py-3 sm:px-6 flex items-center justify-between">
-      <div className="w-10 h-10 sm:w-18 sm:h-18 rounded-full bg-gray-200" />
+      <div className="w-10 h-10 rounded-full bg-gray-300" />
       <div className="flex items-center gap-3 sm:gap-5 text-gray-700">
         <Link href="/friends" aria-label="Friends" className="hover:text-black transition-colors">
           <FaUserFriends size={32} />
@@ -51,9 +51,9 @@ function NavBar() {
         <button aria-label="Notifications" className="hover:text-black transition-colors">
           <FaBell size={32} />
         </button>
-        <button aria-label="Profile" className="hover:text-black transition-colors">
+        <Link href="/" aria-label="Home" className="hover:text-black transition-colors">
           <BsPersonCircle size={32} />
-        </button>
+        </Link>
       </div>
     </header>
   );
