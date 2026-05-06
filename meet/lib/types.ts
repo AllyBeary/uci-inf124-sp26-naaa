@@ -7,10 +7,9 @@ export interface Person {
 
 export interface AvailabilitySlot {
   personId: string;
-  dayIndex: number; // 0 = Monday, 6 = Sunday
+  dayIndex: number;
   startHour: number;
   endHour: number;
-  title?: string;
 }
 
 export interface CalendarEvent {
@@ -21,4 +20,5 @@ export interface CalendarEvent {
   startHour: number;
   endHour: number;
   description?: string;
+  availablePeople?: string[]; // personIds
 }
