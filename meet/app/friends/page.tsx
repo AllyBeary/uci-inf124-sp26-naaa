@@ -1,5 +1,6 @@
 "use client";
 import { useState } from "react";
+import Link from "next/link";
 import { FaUserFriends, FaBell } from "react-icons/fa";
 import { BsPersonCircle } from "react-icons/bs";
 import { HiMagnifyingGlass } from "react-icons/hi2";
@@ -44,9 +45,9 @@ function NavBar() {
     <header className="w-full border-b border-gray-200 bg-white px-4 py-3 sm:px-6 flex items-center justify-between">
       <div className="w-10 h-10 sm:w-18 sm:h-18 rounded-full bg-gray-200" />
       <div className="flex items-center gap-3 sm:gap-5 text-gray-700">
-        <button aria-label="Friends" className="hover:text-black transition-colors">
+        <Link href="/friends" aria-label="Friends" className="hover:text-black transition-colors">
           <FaUserFriends size={32} />
-        </button>
+        </Link>
         <button aria-label="Notifications" className="hover:text-black transition-colors">
           <FaBell size={32} />
         </button>
