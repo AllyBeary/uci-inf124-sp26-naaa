@@ -3,6 +3,7 @@
 import MiniCalendar from "./MiniCalendar";
 import AvailabilityFilter from "./AvailabilityFilter";
 import { people } from "@/lib/sampleData";
+import { useRouter } from "next/navigation";
 
 type SidebarProps = {
   selectedPeople: string[];
@@ -17,12 +18,17 @@ export default function Sidebar({
   currentDate,
   onCurrentDateChange,
 }: SidebarProps) {
+  const router = useRouter();
+
   return (
     <div className="w-44 bg-gray-50 border-r border-gray-200 flex flex-col overflow-y-auto">
       {/* Create Button */}
       <div className="p-4 border-b border-gray-200">
         <div className="border border-gray-300 rounded-2xl p-1 bg-white bg-opacity-50">
-          <button className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 rounded w-full">
+          <button
+            onClick={() => router.push("/create-calendar")}
+            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 rounded w-full"
+          >
             <span className="text-lg">+</span>
             <span>Create</span>
           </button>
