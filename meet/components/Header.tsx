@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { FaUserFriends, FaBell } from "react-icons/fa";
+import { FaUserFriends, FaCalendar } from "react-icons/fa";
 import { BsPersonCircle } from "react-icons/bs";
 import { GoogleCalendarLoginButton } from "./GoogleCalendarIntegration";
 
@@ -26,7 +26,7 @@ export default function Header({ onAccessTokenChange, onUserChange }: HeaderProp
           <FaUserFriends size={32} />
         </Link>
         <button aria-label="Notifications" className="hover:text-black transition-colors">
-          <FaBell size={32} />
+          <FaCalendar size={32} />
         </button>
         <button aria-label="Profile" className="hover:text-black transition-colors">
           <BsPersonCircle size={32} />
