@@ -3,6 +3,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { FaUserFriends, FaCalendar } from "react-icons/fa";
 import { BsPersonCircle } from "react-icons/bs";
+import Header from "@/components/Header";
 import { HiMagnifyingGlass } from "react-icons/hi2";
 
 //Hard coded data (replace later)
@@ -28,36 +29,6 @@ const otherUsers = [
     username: "zivh",
   },
 ];
-
-function NavBar() {
-  return (
-    <header className="w-full border-b border-gray-200 bg-white px-4 py-3 sm:px-6 flex items-center justify-between">
-      <div className="w-10 h-10 rounded-full bg-gray-300" />
-      <div className="flex items-center gap-3 sm:gap-5 text-gray-700">
-        <Link
-          href="/friends"
-          aria-label="Friends"
-          className="hover:text-black transition-colors"
-        >
-          <FaUserFriends size={32} />
-        </Link>
-        <button
-          aria-label="Notifications"
-          className="hover:text-black transition-colors"
-        >
-          <FaCalendar size={32} />
-        </button>
-        <Link
-          href="/"
-          aria-label="Home"
-          className="hover:text-black transition-colors"
-        >
-          <BsPersonCircle size={32} />
-        </Link>
-      </div>
-    </header>
-  );
-}
 
 function SideBar({
   sentRequests,
@@ -190,7 +161,7 @@ export default function FriendsPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
-      <NavBar />
+      <Header />
       <div className="flex flex-1">
         <div className="flex-1 p-4 sm:p-6 sm:pl-8">
           {/* Displays Friends */}
