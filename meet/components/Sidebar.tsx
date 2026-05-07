@@ -9,7 +9,7 @@ type SidebarProps = {
   onSelectedPeopleChange: (selected: string[]) => void;
   currentDate: Date;
   onCurrentDateChange: (date: Date) => void;
-  showAvailiability?: boolean;
+  showAvailability?: boolean;
 };
 
 export default function Sidebar({
@@ -17,7 +17,7 @@ export default function Sidebar({
   onSelectedPeopleChange,
   currentDate,
   onCurrentDateChange,
-  showAvailiability = true,
+  showAvailability = true,
 }: SidebarProps) {
   return (
     <div className="w-44 bg-gray-50 border-r border-gray-200 flex flex-col overflow-y-auto">
@@ -40,7 +40,7 @@ export default function Sidebar({
       </div>
 
       {/* Availability Filter */}
-      {showAvailiability && (
+      {showAvailability && (
         <AvailabilityFilter
           people={people}
           selectedPeople={selectedPeople}

@@ -6,7 +6,7 @@ import Sidebar from "@/components/Sidebar";
 import Calendar from "@/components/Calendar";
 
 export default function Home() {
-  const [selectedPeople, setSelectedPeople] = useState<string[]>(["person1"]);
+  
   const [currentDate, setCurrentDate] = useState(new Date(2026, 3, 1)); // April 2026
   const [processedGoogleEvents, setProcessedGoogleEvents] = useState<Array<{
     dayIndex: number;
@@ -95,14 +95,14 @@ export default function Home() {
       />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar
-          selectedPeople={selectedPeople}
-          onSelectedPeopleChange={setSelectedPeople}
+          selectedPeople={[]}
+          onSelectedPeopleChange={() => {}}
           currentDate={currentDate}
           onCurrentDateChange={setCurrentDate}
-          showAvailiability={false}
+          showAvailability={false}
         />
         <Calendar
-          selectedPeople={selectedPeople}
+          selectedPeople={[]}
           currentDate={currentDate}
           googleEvents={processedGoogleEvents}
           isLoggedIn={isLoggedIn}

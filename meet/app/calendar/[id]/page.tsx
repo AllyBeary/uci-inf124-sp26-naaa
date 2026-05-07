@@ -4,9 +4,11 @@ import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import Calendar from "@/components/Calendar";
+import { people } from "@/lib/sampleData";
 
 export default function CalendarPage() {
-  const [selectedPeople, setSelectedPeople] = useState<string[]>(["person1"]);
+  // Start by displaying all calendars to show availability/overlaps across all people
+  const [selectedPeople, setSelectedPeople] = useState<string[]>(people.map(p => p.id));
   const [currentDate, setCurrentDate] = useState(new Date(2026, 3, 1));
   const [processedGoogleEvents, setProcessedGoogleEvents] = useState<Array<{
     dayIndex: number;
