@@ -25,9 +25,9 @@ export default function Header({ onAccessTokenChange, onUserChange }: HeaderProp
         <Link href="/friends" aria-label="Friends" className="hover:text-black transition-colors">
           <FaUserFriends size={32} />
         </Link>
-        <button aria-label="Notifications" className="hover:text-black transition-colors">
+        <Link href="/home" aria-label="Notifications" className="hover:text-black transition-colors">
           <FaCalendar size={32} />
-        </button>
+        </Link>
         <Link href="/" aria-label="Profile" className="hover:text-black transition-colors">
           <BsPersonCircle size={32} />
         </Link>

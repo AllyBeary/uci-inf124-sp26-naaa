@@ -99,12 +99,14 @@ export default function Home() {
           onSelectedPeopleChange={setSelectedPeople}
           currentDate={currentDate}
           onCurrentDateChange={setCurrentDate}
+          showAvailiability={false}
         />
         <Calendar
           selectedPeople={selectedPeople}
           currentDate={currentDate}
           googleEvents={processedGoogleEvents}
           isLoggedIn={isLoggedIn}
+          showAvailability={false}
         />
       </div>
     </div>
