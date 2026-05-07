@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import Link from "next/link";
-import { FaUserFriends, FaBell } from "react-icons/fa";
+import { FaUserFriends, FaCalendar } from "react-icons/fa";
 import { BsPersonCircle } from "react-icons/bs";
 import { HiMagnifyingGlass } from "react-icons/hi2";
 
@@ -45,7 +45,7 @@ function NavBar() {
           aria-label="Notifications"
           className="hover:text-black transition-colors"
         >
-          <FaBell size={32} />
+          <FaCalendar size={32} />
         </button>
         <Link
           href="/"
