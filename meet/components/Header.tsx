@@ -2,8 +2,6 @@ import Link from "next/link";
 import { FaUserFriends, FaBell } from "react-icons/fa";
 import { BsPersonCircle } from "react-icons/bs";
 import { GoogleCalendarLoginButton } from "./GoogleCalendarIntegration";
-import { FaUserFriends, FaBell } from "react-icons/fa";
-import { BsPersonCircle } from "react-icons/bs";
 
 interface HeaderProps {
   onAccessTokenChange?: (token: string | null) => void;
