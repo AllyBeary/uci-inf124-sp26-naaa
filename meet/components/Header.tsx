@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { FaUserFriends, FaBell } from "react-icons/fa";
+import { BsPersonCircle } from "react-icons/bs";
 import { GoogleCalendarLoginButton } from "./GoogleCalendarIntegration";
 import { FaUserFriends, FaBell } from "react-icons/fa";
 import { BsPersonCircle } from "react-icons/bs";
@@ -21,20 +23,15 @@ export default function Header({ onAccessTokenChange, onUserChange }: HeaderProp
       </div>
 
       {/* Right side - Icons */}
-      <div className="flex items-center gap-6">
-        {/* Friends icon */}
-        <button className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-900">
-          <FaUserFriends size={24} />
+      <div className="flex items-center gap-3 sm:gap-5 text-gray-700">
+        <Link href="/friends" aria-label="Friends" className="hover:text-black transition-colors">
+          <FaUserFriends size={32} />
+        </Link>
+        <button aria-label="Notifications" className="hover:text-black transition-colors">
+          <FaBell size={32} />
         </button>
-
-        {/* Notification bell icon */}
-        <button className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-900">
-          <FaBell size={24} />
-        </button>
-
-        {/* Profile icon */}
-        <button className="p-2 hover:bg-gray-100 rounded-full transition-colors text-gray-900">
-          <BsPersonCircle size={24} />
+        <button aria-label="Profile" className="hover:text-black transition-colors">
+          <BsPersonCircle size={32} />
         </button>
       </div>
     </div>
