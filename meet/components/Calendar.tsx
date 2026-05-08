@@ -14,6 +14,7 @@ import EventModal from "./EventModal";
 
 type CalendarProps = {
   selectedPeople: string[];
+  showAvailability?: boolean;
 };
 
 const HOURS = Array.from({ length: 10 }, (_, i) => i + 8);
@@ -28,7 +29,7 @@ const DAYS = [
   "Sunday",
 ];
 
-export default function Calendar({ selectedPeople }: CalendarProps) {
+export default function Calendar({ selectedPeople, showAvailability = true }: CalendarProps) {
   const personMap = useMemo(
     () => Object.fromEntries(people.map((p) => [p.id, p])),
     []
@@ -126,7 +127,7 @@ export default function Calendar({ selectedPeople }: CalendarProps) {
                   }}
                 >
                   {/* Availability */}
-                  {slots.map((slot, index) => {
+                  {showAvailability && slots.map((slot, index) => {
                     const duration =
                       slot.endHour - slot.startHour;
                     const person = personMap[slot.personId];

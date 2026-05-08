@@ -3,23 +3,24 @@ import { useState } from "react";
 import Link from "next/link";
 import { FaUserFriends, FaCalendar } from "react-icons/fa";
 import { BsPersonCircle } from "react-icons/bs";
+import Header from "@/components/Header";
 import { HiMagnifyingGlass } from "react-icons/hi2";
 
 //Hard coded data (replace later)
-const initialFriends = [
-  {
-    name: "Audrey Phung",
-    username: "audreyp4",
-  },
+const friendsList = [
+  { name: "Audrey Phung", username: "audreyp4" },
+  { name: "Allison Hua", username: "huaat" },
+  { name: "Nicole Saengsouvanna", username: "saengson" },
+];
 
-  {
-    name: "Allison Hua",
-    username: "huaat",
-  },
-  {
-    name: "Nicole Saengsouvanna",
-    username: "saengson",
-  },
+const sentRequestsList = [
+  { name: "Anver Chou", username: "anverc" },
+  { name: "Jane Doe", username: "username" },
+];
+
+const activityList = [
+  { name: "Ethan Votran", username: "evotran" },
+  { name: "John Doe", username: "jd26" },
 ];
 
 const otherUsers = [
@@ -28,36 +29,6 @@ const otherUsers = [
     username: "zivh",
   },
 ];
-
-function NavBar() {
-  return (
-    <header className="w-full border-b border-gray-200 bg-white px-4 py-3 sm:px-6 flex items-center justify-between">
-      <div className="w-10 h-10 rounded-full bg-gray-300" />
-      <div className="flex items-center gap-3 sm:gap-5 text-gray-700">
-        <Link
-          href="/friends"
-          aria-label="Friends"
-          className="hover:text-black transition-colors"
-        >
-          <FaUserFriends size={32} />
-        </Link>
-        <button
-          aria-label="Notifications"
-          className="hover:text-black transition-colors"
-        >
-          <FaCalendar size={32} />
-        </button>
-        <Link
-          href="/"
-          aria-label="Home"
-          className="hover:text-black transition-colors"
-        >
-          <BsPersonCircle size={32} />
-        </Link>
-      </div>
-    </header>
-  );
-}
 
 function SideBar({
   sentRequests,
@@ -132,49 +103,38 @@ function SideBar({
 }
 
 export default function FriendsPage() {
-  const [friends, setFriends] = useState(initialFriends);
+  const [friends, setFriends] = useState(friendsList);
   const [showModal, setShowModal] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-  const [sentRequests, setSentRequests] = useState([
-    {
-      name: "Anver Chou",
-      username: "anverc",
-    },
-    {
-      name: "Jane Doe",
-      username: "username",
-    },
-  ]);
-  const [activity, setActivity] = useState([
-    { name: "Ethan Votran", username: "evotran" },
-    { name: "John Doe", username: "jd26" },
-  ]);
+  const [sentRequests, setSentRequests] = useState(sentRequestsList);
+  const [activity, setActivity] = useState(activityList);
 
   const sendFriendRequest = (user: { name: string; username: string }) => {
-    setSentRequests((prev) => {
-      // prevent duplicates
-      if (prev.some((u) => u.username === user.username)) return prev;
-      return [...prev, user];
-    });
+    if (sentRequestsList.some((u) => u.username === user.username)) return;
+    sentRequestsList.push(user);
+    setSentRequests([...sentRequestsList]);
   };
 
   const removeFriend = (username: string) => {
-    setFriends((prev) => prev.filter((f) => f.username !== username));
+    const idx = friendsList.findIndex((f) => f.username === username);
+    if (idx !== -1) friendsList.splice(idx, 1);
+    setFriends([...friendsList]);
   };
 
   const acceptRequest = (user: { name: string; username: string }) => {
-    // add to friends (avoid duplicates)
-    setFriends((prev) => {
-      if (prev.some((f) => f.username === user.username)) return prev;
-      return [...prev, user];
-    });
-
-    // remove from activity
-    setActivity((prev) => prev.filter((u) => u.username !== user.username));
+    if (!friendsList.some((f) => f.username === user.username)) {
+      friendsList.push(user);
+    }
+    const idx = activityList.findIndex((u) => u.username === user.username);
+    if (idx !== -1) activityList.splice(idx, 1);
+    setFriends([...friendsList]);
+    setActivity([...activityList]);
   };
 
   const declineRequest = (username: string) => {
-    setActivity((prev) => prev.filter((u) => u.username !== username));
+    const idx = activityList.findIndex((u) => u.username === username);
+    if (idx !== -1) activityList.splice(idx, 1);
+    setActivity([...activityList]);
   };
 
   const friendUsernames = new Set(friends.map((f) => f.username));
@@ -190,7 +150,7 @@ export default function FriendsPage() {
 
   return (
     <div className="flex flex-col min-h-screen bg-white">
-      <NavBar />
+      <Header />
       <div className="flex flex-1">
         <div className="flex-1 p-4 sm:p-6 sm:pl-8">
           {/* Displays Friends */}

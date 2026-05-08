@@ -4,10 +4,12 @@ import { useState, useEffect } from "react";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import Calendar from "@/components/Calendar";
+import { people } from "@/lib/sampleData";
 
-export default function Home() {
-  
-  const [currentDate, setCurrentDate] = useState(new Date(2026, 3, 1)); // April 2026
+export default function CalendarPage() {
+  // Start by displaying all calendars to show availability/overlaps across all people
+  const [selectedPeople, setSelectedPeople] = useState<string[]>(people.map(p => p.id));
+  const [currentDate, setCurrentDate] = useState(new Date(2026, 3, 1));
   const [processedGoogleEvents, setProcessedGoogleEvents] = useState<Array<{
     dayIndex: number;
     startHour: number;
@@ -21,7 +23,6 @@ export default function Home() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [accessToken, setAccessToken] = useState<string | null>(null);
 
-  // Check for stored authentication on mount
   useEffect(() => {
     const storedToken = localStorage.getItem("google_access_token");
     const storedEmail = localStorage.getItem("google_user_email");
@@ -33,7 +34,6 @@ export default function Home() {
     }
   }, []);
 
-  // Fetch Google Calendar events when date changes
   useEffect(() => {
     if (isLoggedIn && accessToken) {
       fetchGoogleEvents(accessToken, currentDate);
@@ -42,21 +42,19 @@ export default function Home() {
 
   const fetchGoogleEvents = async (token: string, date: Date) => {
     try {
-      // Get week start and end
       const weekStart = new Date(date);
-      weekStart.setDate(date.getDate() - date.getDay() + 1); // Monday
+      weekStart.setDate(date.getDate() - date.getDay() + 1);
       const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekStart.getDate() + 6); // Sunday
-
-      const timeMin = weekStart.toISOString();
-      const timeMax = weekEnd.toISOString();
+      weekEnd.setDate(weekStart.getDate() + 6);
 
       const response = await fetch("/api/google-events", {
         method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({ accessToken: token, timeMin, timeMax }),
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          accessToken: token,
+          timeMin: weekStart.toISOString(),
+          timeMax: weekEnd.toISOString(),
+        }),
       });
 
       if (response.ok) {
@@ -72,7 +70,6 @@ export default function Home() {
     setAccessToken(token);
     if (token) {
       setIsLoggedIn(true);
-      // Don't call fetchGoogleEvents here - the useEffect will handle it
     } else {
       setIsLoggedIn(false);
       setProcessedGoogleEvents([]);
@@ -95,18 +92,16 @@ export default function Home() {
       />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar
-          selectedPeople={[]}
-          onSelectedPeopleChange={() => {}}
+          selectedPeople={selectedPeople}
+          onSelectedPeopleChange={setSelectedPeople}
           currentDate={currentDate}
           onCurrentDateChange={setCurrentDate}
-          showAvailability={false}
         />
         <Calendar
-          selectedPeople={[]}
+          selectedPeople={selectedPeople}
           currentDate={currentDate}
           googleEvents={processedGoogleEvents}
           isLoggedIn={isLoggedIn}
-          showAvailability={false}
         />
       </div>
     </div>
