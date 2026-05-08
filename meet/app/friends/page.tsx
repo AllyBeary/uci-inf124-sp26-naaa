@@ -7,20 +7,20 @@ import Header from "@/components/Header";
 import { HiMagnifyingGlass } from "react-icons/hi2";
 
 //Hard coded data (replace later)
-const initialFriends = [
-  {
-    name: "Audrey Phung",
-    username: "audreyp4",
-  },
+const friendsList = [
+  { name: "Audrey Phung", username: "audreyp4" },
+  { name: "Allison Hua", username: "huaat" },
+  { name: "Nicole Saengsouvanna", username: "saengson" },
+];
 
-  {
-    name: "Allison Hua",
-    username: "huaat",
-  },
-  {
-    name: "Nicole Saengsouvanna",
-    username: "saengson",
-  },
+const sentRequestsList = [
+  { name: "Anver Chou", username: "anverc" },
+  { name: "Jane Doe", username: "username" },
+];
+
+const activityList = [
+  { name: "Ethan Votran", username: "evotran" },
+  { name: "John Doe", username: "jd26" },
 ];
 
 const otherUsers = [
@@ -103,49 +103,38 @@ function SideBar({
 }
 
 export default function FriendsPage() {
-  const [friends, setFriends] = useState(initialFriends);
+  const [friends, setFriends] = useState(friendsList);
   const [showModal, setShowModal] = useState(false);
   const [searchValue, setSearchValue] = useState("");
-  const [sentRequests, setSentRequests] = useState([
-    {
-      name: "Anver Chou",
-      username: "anverc",
-    },
-    {
-      name: "Jane Doe",
-      username: "username",
-    },
-  ]);
-  const [activity, setActivity] = useState([
-    { name: "Ethan Votran", username: "evotran" },
-    { name: "John Doe", username: "jd26" },
-  ]);
+  const [sentRequests, setSentRequests] = useState(sentRequestsList);
+  const [activity, setActivity] = useState(activityList);
 
   const sendFriendRequest = (user: { name: string; username: string }) => {
-    setSentRequests((prev) => {
-      // prevent duplicates
-      if (prev.some((u) => u.username === user.username)) return prev;
-      return [...prev, user];
-    });
+    if (sentRequestsList.some((u) => u.username === user.username)) return;
+    sentRequestsList.push(user);
+    setSentRequests([...sentRequestsList]);
   };
 
   const removeFriend = (username: string) => {
-    setFriends((prev) => prev.filter((f) => f.username !== username));
+    const idx = friendsList.findIndex((f) => f.username === username);
+    if (idx !== -1) friendsList.splice(idx, 1);
+    setFriends([...friendsList]);
   };
 
   const acceptRequest = (user: { name: string; username: string }) => {
-    // add to friends (avoid duplicates)
-    setFriends((prev) => {
-      if (prev.some((f) => f.username === user.username)) return prev;
-      return [...prev, user];
-    });
-
-    // remove from activity
-    setActivity((prev) => prev.filter((u) => u.username !== user.username));
+    if (!friendsList.some((f) => f.username === user.username)) {
+      friendsList.push(user);
+    }
+    const idx = activityList.findIndex((u) => u.username === user.username);
+    if (idx !== -1) activityList.splice(idx, 1);
+    setFriends([...friendsList]);
+    setActivity([...activityList]);
   };
 
   const declineRequest = (username: string) => {
-    setActivity((prev) => prev.filter((u) => u.username !== username));
+    const idx = activityList.findIndex((u) => u.username === username);
+    if (idx !== -1) activityList.splice(idx, 1);
+    setActivity([...activityList]);
   };
 
   const friendUsernames = new Set(friends.map((f) => f.username));
