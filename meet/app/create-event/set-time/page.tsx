@@ -99,7 +99,7 @@ export default function CreateEventSetTimePage() {
     const handleInviteFriends = () => {
         localStorage.setItem("createEvent_startTime", String(startMinutes));
         localStorage.setItem("createEvent_endTime", String(endMinutes));
-        router.push("/home");
+        router.push("/");
     };
 
     const formatDate = (dateStr: string) => {
@@ -120,6 +120,7 @@ export default function CreateEventSetTimePage() {
                     onSelectedPeopleChange={setSelectedPeople}
                     currentDate={sidebarDate}
                     onCurrentDateChange={setSidebarDate}
+                    showAvailability={false}
                 />
 
                 <main className="flex-1 flex flex-col overflow-hidden p-6 bg-gray-50">

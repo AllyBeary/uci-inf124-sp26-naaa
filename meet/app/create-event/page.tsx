@@ -65,6 +65,7 @@ export default function CreateEventSelectDatesPage() {
                     onSelectedPeopleChange={setSelectedPeople}
                     currentDate={sidebarDate}
                     onCurrentDateChange={setSidebarDate}
+                    showAvailability={false}
                 />
 
                 <main className="flex-1 flex flex-col overflow-hidden p-6 bg-gray-50">
