@@ -96,6 +96,7 @@ export default function CreateEventSetTimePage() {
     const startPct = (startMinutes / 1440) * 100;
     const widthPct = ((endMinutes - startMinutes) / 1440) * 100;
 
+    //FIX: Should redirect to respective calendar page, Shared calendar pages VS personal calendar page
     const handleInviteFriends = () => {
         localStorage.setItem("createEvent_startTime", String(startMinutes));
         localStorage.setItem("createEvent_endTime", String(endMinutes));
@@ -259,7 +260,7 @@ export default function CreateEventSetTimePage() {
                                 onClick={handleInviteFriends}
                                 className="flex items-center gap-2 px-5 py-2 text-sm font-medium text-white bg-gray-800 hover:bg-gray-900 rounded-lg transition-colors cursor-pointer"
                             >
-                                Invite Friends
+                                Submit
                                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                 </svg>
