@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/app/api/mongo-db/client";
 import { Friendship } from "@/app/api/mongo-db/friendship.model";
+import "@/app/api/mongo-db/user.model";
 
 //Get all friendships for a user by status
 export async function GET(request: NextRequest) {
