@@ -1,29 +1,12 @@
-import mongoose, { Schema, Document, Model } from "mongoose";
+import mongoose from "mongoose";
 
-export interface IUser extends Document {
-  name: string;
-  email: string;
-  createdAt: Date;
-}
+const userSchema = new mongoose.Schema({
+  googleId:    { type: String, required: true, unique: true }, // from Google OAuth
+  email:       { type: String, required: true, unique: true },
+  displayName: { type: String },
+  photoURL:    { type: String },
+  googleAccessToken:  { type: String, required: true },  // for calling Google Calendar API
+  googleRefreshToken: { type: String },
+}, { timestamps: true });
 
-const UserSchema = new Schema<IUser>(
-  {
-    name: {
-      type: String,
-      required: true,
-    },
-
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-    },
-  },
-  {
-    timestamps: true,
-  }
-);
-
-export const User: Model<IUser> =
-  mongoose.models.User ||
-  mongoose.model<IUser>("User", UserSchema);
+export const User = mongoose.models.User || mongoose.model("User", userSchema);
