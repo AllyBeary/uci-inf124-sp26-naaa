@@ -1,9 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
 import MiniCalendar from "./MiniCalendar";
 import AvailabilityFilter from "./AvailabilityFilter";
-import { people } from "@/lib/userData";
+import { people as allPeople } from "@/lib/userData";
+import { Person } from "@/lib/types";
 
 type SidebarProps = {
   selectedPeople: string[];
@@ -12,6 +12,7 @@ type SidebarProps = {
   onCurrentDateChange: (date: Date) => void;
   showAvailability?: boolean;
   onAddAvailability?: () => void;
+  people?: Person[];
 };
 
 export default function Sidebar({
@@ -21,9 +22,8 @@ export default function Sidebar({
                                   onCurrentDateChange,
                                   showAvailability = true,
                                   onAddAvailability,
+                                  people = allPeople,
                                 }: SidebarProps) {
-  const router = useRouter();
-
   return (
       <div className="w-44 bg-gray-50 border-r border-gray-200 flex flex-col overflow-y-auto">
         {/* Create Button */}

@@ -2,19 +2,17 @@ import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/app/api/mongo-db/client";
 import { Group } from "@/app/api/mongo-db/group.model";
 
-//Returns all the groups that the users are apart of 
+//Returns all first-person's user groups
 export async function GET(request: NextRequest) {
   try {
     await connectDB();
     const { searchParams } = new URL(request.url);
     const userId = searchParams.get("userId");
-    if (!userId) {
-      return NextResponse.json({ error: "Missing userId" }, { status: 400 });
-    }
+    const filter = userId ? { members: userId } : {};
 
-    const groups = await Group.find({ members: userId })
-      .populate("owner", "displayName email photoURL")
-      .populate("members", "displayName email photoURL");
+    const groups = await Group.find(filter)
+      .populate("owner", "displayName")
+      .populate("members", "displayName");
 
     return NextResponse.json({ groups });
   } catch (error) {
@@ -36,8 +34,8 @@ export async function POST(request: NextRequest) {
 
     const group = await Group.create({ name, owner: ownerID, members: memberIDs ?? [] });
 
-    await group.populate("owner", "displayName email photoURL");
-    await group.populate("members", "displayName email photoURL");
+    await group.populate("owner", "displayName email");
+    await group.populate("members", "displayName email");
 
     return NextResponse.json({ group }, { status: 201 });
   } catch (error) {
