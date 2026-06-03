@@ -7,13 +7,13 @@ import { useState, useEffect } from "react";
 type CalendarGroup = {
   _id: string;
   name: string;
-  owner: { displayName?: string; email?: string } | null;
+  owner: string | null;
 };
 
 const calendarEvents: CalendarGroup = {
   _id: "inf124-group",
   name: "INF 124 Group",
-  owner: { displayName: "Nicole Saengsouvanna" },
+  owner: "Nicole Saengsouvanna",
 };
 
 export default function HomePage() {
@@ -51,7 +51,7 @@ export default function HomePage() {
                     <div className="flex items-center gap-2">
                       <BsPersonCircle size={28} className="text-gray-500 shrink-0" />
                       <div>
-                        <p className="text-sm font-medium text-gray-800">{n.owner?.displayName ?? n.owner?.email ?? "Unknown"}</p>
+                        <p className="text-sm font-medium text-gray-800">{n.owner ?? "Unknown"}</p>
                       </div>
                     </div>
                   </div>

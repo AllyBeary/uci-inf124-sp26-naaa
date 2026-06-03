@@ -7,9 +7,7 @@ export async function GET(request: NextRequest, { params }: { params: Promise<{ 
   try {
     await connectDB();
     const { id } = await params;
-    const group = await Group.findById(id)
-      .populate("owner", "displayName email photoURL")
-      .populate("members", "displayName email photoURL");
+    const group = await Group.findById(id);
 
     if (!group) {
       return NextResponse.json({ error: "Group not found" }, { status: 404 });

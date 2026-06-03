@@ -1,39 +1,52 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams, useSearchParams } from "next/navigation";
+import { useParams } from "next/navigation";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import Calendar from "@/components/Calendar";
 import AddAvailabilityModal from "@/components/AddAvailabilityModal";
-import { people } from "@/lib/userData";
-import { AvailabilitySlot } from "@/lib/types";
+import { people as allPeople } from "@/lib/userData";
+import { AvailabilitySlot, Person } from "@/lib/types";
 
 export default function CalendarPage() {
   const { id: groupId } = useParams<{ id: string }>();
-  const searchParams = useSearchParams();
 
-  const groupPeople = (() => {
-    const members = searchParams.get("members");
-    if (members) {
-      const ids = members.split(",");
-      return people.filter((p) => ids.includes(p.id));
-    }
-    return people;
-  })();
-
-  const [selectedPeople, setSelectedPeople] = useState<string[]>(groupPeople.map((p) => p.id));
+  const [groupPeople, setGroupPeople] = useState<Person[]>([]);
+  const [selectedPeople, setSelectedPeople] = useState<string[]>([]);
   const [currentDate, setCurrentDate] = useState(new Date());
   const [mySlots, setMySlots] = useState<AvailabilitySlot[]>([]);
   const [showModal, setShowModal] = useState(false);
 
+  // Fetch group members from the API; fall back to all hardcoded people for static groups
+  useEffect(() => {
+    if (!groupId) return;
+    fetch(`/api/calendar-groups/${groupId}`)
+      .then(r => r.json())
+      .then(({ group }) => {
+        const members: Person[] = group?.members?.length
+          ? (group.members as string[]).map((id: string) => {
+              const known = allPeople.find(p => p.id === id);
+              return known ?? { id, name: id, initials: id.slice(0, 2).toUpperCase() };
+            })
+          : allPeople;
+        setGroupPeople(members);
+        setSelectedPeople(members.map(p => p.id));
+      })
+      .catch(() => {
+        setGroupPeople(allPeople);
+        setSelectedPeople(allPeople.map(p => p.id));
+      });
+  }, [groupId]);
+
+  // Fetch all group availability from the API
   useEffect(() => {
     if (!groupId) return;
     fetch(`/api/availability?groupId=${groupId}`)
       .then(r => r.json())
       .then(({ slots }) => {
         if (!Array.isArray(slots)) return;
-        setMySlots(slots.map((s: { _id: string; dayIndex: number; startHour: number; endHour: number }) => ({
+        setMySlots(slots.map((s: { dayIndex: number; startHour: number; endHour: number }) => ({
           personId: "me",
           dayIndex: s.dayIndex,
           startHour: s.startHour,

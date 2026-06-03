@@ -38,11 +38,25 @@ export default function CreateCalendarPage() {
     setShowModal(true);
   };
 
-  const handleConfirm = () => {
-    const newId = Date.now().toString();
-    const query = addedIds.length > 0 ? `?members=${addedIds.join(",")}` : "";
-    setShowModal(false);
-    router.push(`/calendar/${newId}${query}`);
+  const handleConfirm = async () => {
+    try {
+      const res = await fetch("/api/calendar-groups", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: calendarName,
+          ownerID: "me",
+          memberIDs: addedIds,
+        }),
+      });
+      if (!res.ok) throw new Error("Failed to create group");
+      const { group } = await res.json();
+      setShowModal(false);
+      const query = addedIds.length > 0 ? `?members=${addedIds.join(",")}` : "";
+      router.push(`/calendar/${group._id}${query}`);
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   const avatarColors = [

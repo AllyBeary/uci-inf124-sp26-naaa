@@ -9,4 +9,7 @@ const availabilitySchema = new mongoose.Schema({
 
 availabilitySchema.index({ groupId: 1 });
 
-export const Availability = mongoose.models.Availability || mongoose.model("Availability", availabilitySchema);
+if (mongoose.models.Availability) {
+  delete (mongoose.models as any).Availability;
+}
+export const Availability = mongoose.model("Availability", availabilitySchema);

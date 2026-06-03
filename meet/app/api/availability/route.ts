@@ -28,7 +28,7 @@ export async function POST(request: NextRequest) {
     const { groupId, slots } = await request.json();
 
     if (!groupId || !Array.isArray(slots) || slots.length === 0) {
-      return NextResponse.json({ error: "Missing groupId, or slots" }, { status: 400 });
+      return NextResponse.json({ error: "Missing groupId or slots" }, { status: 400 });
     }
 
     const docs = slots.map(({ dayIndex, startHour, endHour }: { dayIndex: number; startHour: number; endHour: number }) => ({

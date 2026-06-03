@@ -10,9 +10,7 @@ export async function GET(request: NextRequest) {
     const userId = searchParams.get("userId");
     const filter = userId ? { members: userId } : {};
 
-    const groups = await Group.find(filter)
-      .populate("owner", "displayName")
-      .populate("members", "displayName");
+    const groups = await Group.find(filter);
 
     return NextResponse.json({ groups });
   } catch (error) {
@@ -33,9 +31,6 @@ export async function POST(request: NextRequest) {
     }
 
     const group = await Group.create({ name, owner: ownerID, members: memberIDs ?? [] });
-
-    await group.populate("owner", "displayName email");
-    await group.populate("members", "displayName email");
 
     return NextResponse.json({ group }, { status: 201 });
   } catch (error) {

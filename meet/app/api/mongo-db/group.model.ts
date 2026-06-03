@@ -2,13 +2,13 @@ import mongoose from "mongoose";
 
 const groupSchema = new mongoose.Schema({
   name:    { type: String, required: true },
-  owner:   { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  members: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  owner:   { type: String, required: true },
+  members: [{ type: String }],
 }, { timestamps: true });
 
 // ensure owner is always a member
-groupSchema.pre('save', async function () {
-  if (!this.members.map(String).includes(String(this.owner))) {
+groupSchema.pre('save', function () {
+  if (!this.members.includes(this.owner)) {
     this.members.push(this.owner);
   }
 });
@@ -18,4 +18,8 @@ groupSchema.index({ owner: 1 });
 // show groups the user is a member of
 groupSchema.index({ members: 1 });
 
-export const Group = mongoose.models.Group || mongoose.model("Group", groupSchema);
+// Delete cached model so schema changes are picked up on hot reload
+if (mongoose.models.Group) {
+  delete (mongoose.models as any).Group;
+}
+export const Group = mongoose.model("Group", groupSchema);
