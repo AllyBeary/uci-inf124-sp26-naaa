@@ -7,28 +7,10 @@ import { useState } from "react";
 export const calendarEvents = [
     {
         id: 1,
-        title: "Thursday Hangouts",
-        owner: "Audrey Phung",
-        username: "audreyp4",
-    },
-    {
-        id: 2,
-        title: "Weekly Meetings w/ Project Team",
-        owner: "Anver Chou",
-        username: "anverc",
-    },
-    {
-        id: 3,
         title: "INF 124 Group",
         owner: "Nicole Saengsouvanna",
         username: "saengson",
-    },
-    {
-        id: 4,
-        title: "Study Sessions",
-        owner: "Ethan Votran",
-        username: "evotran",
-    },
+    }
 ];
 
 export default function HomePage() {

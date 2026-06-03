@@ -220,7 +220,7 @@ export default function FriendsPage() {
                                 <button
                                   onClick={() => sendFriendRequest(user)}
                                   disabled={isSent}
-                                  className="shrink-0 w-15 py-1 border border-gray-400 text-xs rounded-lg 
+                                  className="shrink-0 w-15 py-1 border border-gray-400 text-xs rounded-lg
                                       disabled:opacity-50 disabled:cursor-not-allowed"
                                 >
                                   {isSent ? "Sent" : "+ Add"}
@@ -258,7 +258,6 @@ export default function FriendsPage() {
                   </p>
                 </div>
 
-                {/* Remove Friends (Consider adding some error guard for users) */}
                 <button
                   onClick={() => removeFriend(friend.username)}
                   className="shrink-0 w-20 py-1 border border-gray-400 text-xs text-gray-600 rounded-lg hover:bg-red-50 hover:border-red-300 hover:text-red-500 transition-colors"

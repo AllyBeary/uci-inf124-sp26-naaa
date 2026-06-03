@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import MiniCalendar from "./MiniCalendar";
 import AvailabilityFilter from "./AvailabilityFilter";
-import { people } from "@/lib/sampleData";
+import { people } from "@/lib/userData";
 
 type SidebarProps = {
   selectedPeople: string[];
@@ -11,6 +11,7 @@ type SidebarProps = {
   currentDate: Date;
   onCurrentDateChange: (date: Date) => void;
   showAvailability?: boolean;
+  onAddAvailability?: () => void;
 };
 
 export default function Sidebar({
@@ -19,6 +20,7 @@ export default function Sidebar({
                                   currentDate,
                                   onCurrentDateChange,
                                   showAvailability = true,
+                                  onAddAvailability,
                                 }: SidebarProps) {
   const router = useRouter();
 
@@ -28,11 +30,11 @@ export default function Sidebar({
         <div className="p-4 border-b border-gray-200">
           <div className="border border-gray-300 rounded-2xl p-1 bg-white bg-opacity-50">
             <button
-                onClick={() => router.push("/create-event")}
+                onClick={() => onAddAvailability?.()}
                 className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-200 rounded w-full cursor-pointer"
             >
               <span className="text-lg">+</span>
-              <span>Create</span>
+              <span>Add Availability</span>
             </button>
           </div>
         </div>

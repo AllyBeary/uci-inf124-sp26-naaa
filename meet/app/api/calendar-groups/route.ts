@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/app/api/mongo-db/client";
 import { Group } from "@/app/api/mongo-db/group.model";
-import "@/app/api/mongo-db/user.model";
 
 //Returns all the groups that the users are apart of 
 export async function GET(request: NextRequest) {
