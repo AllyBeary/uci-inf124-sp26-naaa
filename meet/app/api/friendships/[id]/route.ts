@@ -4,7 +4,6 @@ import { Friendship } from "@/app/api/mongo-db/friendship.model";
 
 // PATCH /api/friendships/[id]
 // Body: { status: "accepted" | "declined" }
-// Accepts or declines a pending friend request
 export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     await connectDB();
@@ -33,7 +32,6 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 }
 
 // DELETE /api/friendships/[id]
-// Removes a friendship (unfriend or cancel/reject a request)
 export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
   try {
     await connectDB();

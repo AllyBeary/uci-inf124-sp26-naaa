@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/app/api/mongo-db/client";
 import { Friendship } from "@/app/api/mongo-db/friendship.model";
-import "@/app/api/mongo-db/user.model";
 
 //Get all friendships for a user by status
 export async function GET(request: NextRequest) {
@@ -17,7 +16,7 @@ export async function GET(request: NextRequest) {
     }
 
     //Distinguish between sender and receiver roles
-    const role = searchParams.get("role"); 
+    const role = searchParams.get("role");
 
     let query: Record<string, any> = {};
     if (role === "requester") query.requester = userId;
@@ -26,9 +25,7 @@ export async function GET(request: NextRequest) {
 
     if (status) query.status = status;
 
-    const friendships = await Friendship.find(query)
-      .populate("requester", "displayName email photoURL")
-      .populate("recipient", "displayName email photoURL");
+    const friendships = await Friendship.find(query);
 
     return NextResponse.json({ friendships });
   } catch (error) {
@@ -39,7 +36,6 @@ export async function GET(request: NextRequest) {
 
 // POST /api/friendships
 // Body: { requesterId, recipientId }
-// Sends a friend request (creates a pending Friendship)
 export async function POST(request: NextRequest) {
   try {
     await connectDB();
@@ -61,7 +57,6 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({ friendship }, { status: 201 });
   } catch (error: any) {
-    // Duplicate key error — request already exists
     if (error.code === 11000) {
       return NextResponse.json({ error: "Friend request already exists" }, { status: 409 });
     }

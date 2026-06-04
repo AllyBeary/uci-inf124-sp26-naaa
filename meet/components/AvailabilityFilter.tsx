@@ -39,7 +39,7 @@ export default function AvailabilityFilter({
       </div>
 
       <div className="space-y-2">
-        {people.map((person) => (
+        {people.filter((p) => p.id !== "me").map((person) => (
           <button
             key={person.id}
             onClick={() => togglePerson(person.id)}
@@ -55,10 +55,7 @@ export default function AvailabilityFilter({
               onChange={() => {}}
               className="w-4 h-4 rounded"
             />
-            <div className="flex items-center gap-2">
-              <div className={`w-3 h-3 rounded ${person.color}`}></div>
-              <span className="text-sm text-gray-700">{person.name}</span>
-            </div>
+            <span className="text-sm text-gray-700">{person.name}</span>
           </button>
         ))}
       </div>

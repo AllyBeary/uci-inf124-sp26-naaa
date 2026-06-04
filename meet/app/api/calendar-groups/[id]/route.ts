@@ -1,16 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 import { connectDB } from "@/app/api/mongo-db/client";
 import { Group } from "@/app/api/mongo-db/group.model";
-import "@/app/api/mongo-db/user.model";
 
 //Returns all members of a certain group specified by group ID
 export async function GET(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
     await connectDB();
     const { id } = await params;
-    const group = await Group.findById(id)
-      .populate("owner", "displayName email photoURL")
-      .populate("members", "displayName email photoURL");
+    const group = await Group.findById(id);
 
     if (!group) {
       return NextResponse.json({ error: "Group not found" }, { status: 404 });

@@ -1,109 +1,111 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useParams } from "next/navigation";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
 import Calendar from "@/components/Calendar";
-import { people } from "@/lib/sampleData";
+import AddAvailabilityModal from "@/components/AddAvailabilityModal";
+import { people as allPeople } from "@/lib/userData";
+import { AvailabilitySlot, Person } from "@/lib/types";
 
 export default function CalendarPage() {
-  // Start by displaying all calendars to show availability/overlaps across all people
-  const [selectedPeople, setSelectedPeople] = useState<string[]>(people.map(p => p.id));
-  const [currentDate, setCurrentDate] = useState(new Date(2026, 3, 1));
-  const [processedGoogleEvents, setProcessedGoogleEvents] = useState<Array<{
-    dayIndex: number;
-    startHour: number;
-    endHour: number;
-    duration: number;
-    event: {
-      id: string;
-      summary: string;
-    };
-  }>>([]);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [accessToken, setAccessToken] = useState<string | null>(null);
+  const { id: groupId } = useParams<{ id: string }>();
 
+  const [groupPeople, setGroupPeople] = useState<Person[]>([]);
+  const [selectedPeople, setSelectedPeople] = useState<string[]>([]);
+  const [currentDate, setCurrentDate] = useState(new Date());
+  const [mySlots, setMySlots] = useState<AvailabilitySlot[]>([]);
+  const [showModal, setShowModal] = useState(false);
+
+  // Fetch group members from the API; fall back to all hardcoded people for static groups
   useEffect(() => {
-    const storedToken = localStorage.getItem("google_access_token");
-    const storedEmail = localStorage.getItem("google_user_email");
-
-    if (storedToken && storedEmail) {
-      setIsLoggedIn(true);
-      setAccessToken(storedToken);
-      fetchGoogleEvents(storedToken, currentDate);
-    }
-  }, []);
-
-  useEffect(() => {
-    if (isLoggedIn && accessToken) {
-      fetchGoogleEvents(accessToken, currentDate);
-    }
-  }, [currentDate, isLoggedIn, accessToken]);
-
-  const fetchGoogleEvents = async (token: string, date: Date) => {
-    try {
-      const weekStart = new Date(date);
-      weekStart.setDate(date.getDate() - date.getDay() + 1);
-      const weekEnd = new Date(weekStart);
-      weekEnd.setDate(weekStart.getDate() + 6);
-
-      const response = await fetch("/api/google-events", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          accessToken: token,
-          timeMin: weekStart.toISOString(),
-          timeMax: weekEnd.toISOString(),
-        }),
+    if (!groupId) return;
+    fetch(`/api/calendar-groups/${groupId}`)
+      .then(r => r.json())
+      .then(({ group }) => {
+        const members: Person[] = group?.members?.length
+          ? (group.members as string[]).map((id: string) => {
+              const known = allPeople.find(p => p.id === id);
+              return known ?? { id, name: id, initials: id.slice(0, 2).toUpperCase() };
+            })
+          : allPeople;
+        setGroupPeople(members);
+        setSelectedPeople(members.map(p => p.id));
+      })
+      .catch(() => {
+        setGroupPeople(allPeople);
+        setSelectedPeople(allPeople.map(p => p.id));
       });
+  }, [groupId]);
 
-      if (response.ok) {
-        const data = await response.json();
-        setProcessedGoogleEvents(data.events || []);
+  // Fetch all group availability from the API
+  useEffect(() => {
+    if (!groupId) return;
+    fetch(`/api/availability?groupId=${groupId}`)
+      .then(r => r.json())
+      .then(({ slots }) => {
+        if (!Array.isArray(slots)) return;
+        setMySlots(slots.map((s: { dayIndex: number; startHour: number; endHour: number }) => ({
+          personId: "me",
+          dayIndex: s.dayIndex,
+          startHour: s.startHour,
+          endHour: s.endHour,
+        })));
+      })
+      .catch(console.error);
+  }, [groupId]);
+
+  const handleAddAvailability = async (dayIndices: number[], startHour: number, endHour: number) => {
+    const newSlots: AvailabilitySlot[] = dayIndices.map((dayIndex) => ({
+      personId: "me",
+      dayIndex,
+      startHour,
+      endHour,
+    }));
+
+    setMySlots((prev) => [...prev, ...newSlots]);
+
+    if (groupId) {
+      try {
+        await fetch("/api/availability", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            groupId,
+            slots: dayIndices.map((dayIndex) => ({ dayIndex, startHour, endHour })),
+          }),
+        });
+      } catch (error) {
+        console.error("Failed to save availability:", error);
       }
-    } catch (error) {
-      console.error("Error fetching Google Calendar events:", error);
-    }
-  };
-
-  const handleAccessTokenChange = (token: string | null) => {
-    setAccessToken(token);
-    if (token) {
-      setIsLoggedIn(true);
-    } else {
-      setIsLoggedIn(false);
-      setProcessedGoogleEvents([]);
-    }
-  };
-
-  const handleUserChange = (user: { name: string; email: string } | null) => {
-    if (!user) {
-      setIsLoggedIn(false);
-      setAccessToken(null);
-      setProcessedGoogleEvents([]);
     }
   };
 
   return (
     <div className="flex flex-col h-screen bg-white">
-      <Header
-        onAccessTokenChange={handleAccessTokenChange}
-        onUserChange={handleUserChange}
-      />
+      <Header />
       <div className="flex flex-1 overflow-hidden">
         <Sidebar
+          people={groupPeople}
           selectedPeople={selectedPeople}
           onSelectedPeopleChange={setSelectedPeople}
           currentDate={currentDate}
           onCurrentDateChange={setCurrentDate}
+          onAddAvailability={() => setShowModal(true)}
         />
         <Calendar
           selectedPeople={selectedPeople}
-          currentDate={currentDate}
-          googleEvents={processedGoogleEvents}
-          isLoggedIn={isLoggedIn}
+          mySlots={mySlots}
         />
       </div>
+
+      {showModal && (
+        <AddAvailabilityModal
+          onConfirm={handleAddAvailability}
+          onClose={() => setShowModal(false)}
+        />
+      )}
     </div>
   );
 }
