@@ -32,12 +32,12 @@ const overlapColor = (count: number) => {
 };
 
 export default function Calendar({
-                                     selectedPeople,
-                                     mySlots = [],
-                                     events = [],
-                                     onEventClick,
-                                     showAvailability = true,
-                                 }: CalendarProps) {
+    selectedPeople,
+    mySlots = [],
+    events = [],
+    onEventClick,
+    showAvailability = true,
+}: CalendarProps) {
     const personMap = useMemo(
         () => Object.fromEntries(people.map((p) => [p.id, p])),
         []
@@ -48,6 +48,18 @@ export default function Calendar({
     );
 
     const allSlots = [...hardcodedSlots, ...mySlots];
+
+    const availabilityByDayHour = useMemo(() => {
+        const map: Record<number, Record<number, AvailabilitySlot[]>> = {};
+        for (const slot of allSlots) {
+            for (let h = slot.startHour; h < slot.endHour; h++) {
+                if (!map[slot.dayIndex]) map[slot.dayIndex] = {};
+                if (!map[slot.dayIndex][h]) map[slot.dayIndex][h] = [];
+                map[slot.dayIndex][h].push(slot);
+            }
+        }
+        return map;
+    }, [allSlots]);
 
     // People whose availability is consumed by an event covering a given cell.
     const bookedPeopleAt = (dayIndex: number, hour: number) => {
@@ -134,10 +146,20 @@ export default function Calendar({
                                 return true;
                             });
 
+                            const prevSlots = availabilityByDayHour?.[dayIndex]?.[hour - 1] ?? [];
+                            const nextSlots = availabilityByDayHour?.[dayIndex]?.[hour + 1] ?? [];
+
+                            const prevHasSamePeople = hasContent && prevSlots.length === slots.length;
+                            const nextHasSamePeople = hasContent && nextSlots.length === slots.length;
+
+                            const roundingClass = showAvailability && hasContent
+                                ? `${!prevHasSamePeople ? "rounded-t-md" : ""} ${!nextHasSamePeople ? "rounded-b-md" : ""}`
+                                : "";
+
                             return (
                                 <div
                                     key={`${dayIndex}-${hour}`}
-                                    className={`flex-1 border-r border-gray-300 relative h-16 transition-colors ${
+                                    className={`flex-1 border-r border-gray-300 relative h-16 transition-colors ${roundingClass} ${
                                         showAvailability && hasContent
                                             ? overlapColor(slots.length)
                                             : "bg-white"
@@ -167,8 +189,8 @@ export default function Calendar({
                                             >
                                                 {isStart && (
                                                     <span className="block text-[10px] text-white px-1 pt-0.5 font-semibold truncate">
-                            {e.title}
-                          </span>
+                                                        {e.title}
+                                                    </span>
                                                 )}
                                             </div>
                                         );
