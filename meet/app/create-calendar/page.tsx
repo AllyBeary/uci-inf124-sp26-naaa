@@ -79,7 +79,7 @@ export default function CreateCalendarPage() {
             onClick={() => router.back()}
             className="flex cursor-pointer items-center gap-1 mb-6 text-sm font-medium text-gray-600 hover:text-gray-700 transition-colors"
           >
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
             Back
@@ -98,10 +98,11 @@ export default function CreateCalendarPage() {
             <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
               {/* Calendar Name */}
               <div className="p-6 border-b border-gray-100">
-                <label className="block text-xs font-semibold text-gray-700 uppercase tracking-widest mb-3">
+                <label htmlFor="calendar-name" className="block text-xs font-semibold text-gray-700 uppercase tracking-widest mb-3">
                   Calendar name
                 </label>
                 <input
+                  id="calendar-name"
                   type="text"
                   placeholder="Type Calendar Name Here..."
                   value={calendarName}
@@ -129,9 +130,10 @@ export default function CreateCalendarPage() {
                   </div>
                   <button
                     onClick={() => { setShowAddForm((v) => !v); setInputError(false); setInputId(""); }}
+                    aria-expanded={showAddForm}
                     className="flex items-center gap-1.5 px-3 py-3 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors"
                   >
-                    <svg className="w-4 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-4 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
                     </svg>
                     Add person
@@ -146,6 +148,9 @@ export default function CreateCalendarPage() {
                       <input
                         type="text"
                         placeholder="UCInet ID"
+                        aria-label="UCInet ID of person to invite"
+                        aria-invalid={inputError}
+                        aria-describedby={inputError ? "input-error-msg" : undefined}
                         value={inputId}
                         onChange={(e) => { setInputId(e.target.value); setInputError(false); }}
                         onKeyDown={(e) => e.key === "Enter" && handleAddPerson()}
@@ -156,7 +161,7 @@ export default function CreateCalendarPage() {
                         }`}
                       />
                       {inputError && (
-                        <p className="text-xs text-red-500">User not found or already added.</p>
+                        <p id="input-error-msg" role="alert" className="text-xs text-red-500">User not found or already added.</p>
                       )}
                       <div className="flex gap-2 justify-end mt-1">
                         <button
@@ -194,9 +199,10 @@ export default function CreateCalendarPage() {
                       </div>
                       <button
                         onClick={() => handleRemovePerson(person.id)}
-                        className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-400 rounded transition-all"
+                        aria-label={`Remove ${person.name} from calendar`}
+                        className="opacity-0 group-hover:opacity-100 focus:opacity-100 p-1 text-gray-400 hover:text-red-400 rounded transition-all"
                       >
-                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                         </svg>
                       </button>

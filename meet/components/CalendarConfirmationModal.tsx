@@ -46,14 +46,20 @@ export default function CalendarConfirmationModal({
       />
 
       {/* Modal */}
-      <div className="relative w-full max-w-md mx-4 bg-white rounded-2xl shadow-2xl border border-gray-100 animate-in fade-in zoom-in duration-200">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="confirm-calendar-title"
+        className="relative w-full max-w-md mx-4 bg-white rounded-2xl shadow-2xl border border-gray-100 animate-in fade-in zoom-in duration-200"
+      >
         <div className="px-6 pt-6 pb-4 border-b border-gray-100">
-          <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-4">
+          <div className="w-12 h-12 rounded-full bg-blue-100 flex items-center justify-center mb-4" aria-hidden="true">
             <svg
               className="w-6 h-6 text-blue-600"
               fill="none"
               stroke="currentColor"
               viewBox="0 0 24 24"
+              aria-hidden="true"
             >
               <path
                 strokeLinecap="round"
@@ -64,7 +70,7 @@ export default function CalendarConfirmationModal({
             </svg>
           </div>
 
-          <h2 className="text-xl font-semibold text-gray-900">
+          <h2 id="confirm-calendar-title" className="text-xl font-semibold text-gray-900">
             Create calendar?
           </h2>
 

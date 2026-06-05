@@ -10,19 +10,17 @@ const fmt = (h: number) => {
 };
 
 type Props = {
-    date: Date;
+    dayName: string;
     initialStart: number;
     initialEnd: number;
     onSave: (data: { title: string; startHour: number; endHour: number }) => void;
     onClose: () => void;
 };
 
-export default function CreateEventModal({ date, initialStart, initialEnd, onSave, onClose }: Props) {
+export default function CreateEventModal({ dayName, initialStart, initialEnd, onSave, onClose }: Props) {
     const [title, setTitle] = useState("");
     const [startHour, setStartHour] = useState(initialStart);
     const [endHour, setEndHour] = useState(initialEnd);
-
-    const dateLabel = date.toLocaleDateString("en-US", { month: "numeric", day: "numeric" });
 
     const canSave = title.trim().length > 0 && endHour > startHour;
 
@@ -34,19 +32,25 @@ export default function CreateEventModal({ date, initialStart, initialEnd, onSav
 
     return (
         <>
-            <div className="fixed inset-0 bg-black/30 z-40" onClick={onClose} />
+            <div className="fixed inset-0 bg-black/30 z-40" onClick={onClose} aria-hidden="true" />
             <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
-                <div className="bg-white rounded-xl shadow-lg p-6 w-96 pointer-events-auto border border-gray-200">
+                <div
+                    role="dialog"
+                    aria-modal="true"
+                    aria-labelledby="create-event-title"
+                    className="bg-white rounded-xl shadow-lg p-6 w-96 pointer-events-auto border border-gray-200"
+                >
                     <div className="flex items-start justify-between mb-4">
-                        <h2 className="text-lg font-semibold text-gray-900">Create Event on {dateLabel}?</h2>
-                        <button onClick={onClose} className="text-gray-500 hover:text-black text-lg leading-none">
+                        <h2 id="create-event-title" className="text-lg font-semibold text-gray-900">Create Event on {dayName}?</h2>
+                        <button onClick={onClose} aria-label="Close create event dialog" className="text-gray-500 hover:text-black text-lg leading-none">
                             ✕
                         </button>
                     </div>
 
                     {/* Event name */}
-                    <label className="block text-sm text-gray-600 mb-1">Event name</label>
+                    <label htmlFor="event-title" className="block text-sm text-gray-600 mb-1">Event name</label>
                     <input
+                        id="event-title"
                         type="text"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
@@ -59,6 +63,7 @@ export default function CreateEventModal({ date, initialStart, initialEnd, onSav
                     <p className="text-sm text-gray-600 mb-2">Selected time:</p>
                     <div className="flex items-center gap-3 mb-6">
                         <select
+                            aria-label="Start time"
                             value={startHour}
                             onChange={(e) => {
                                 const val = Number(e.target.value);
@@ -71,8 +76,9 @@ export default function CreateEventModal({ date, initialStart, initialEnd, onSav
                                 <option key={h} value={h}>{fmt(h)}</option>
                             ))}
                         </select>
-                        <span className="text-sm text-gray-500">to</span>
+                        <span className="text-sm text-gray-500" aria-hidden="true">to</span>
                         <select
+                            aria-label="End time"
                             value={endHour}
                             onChange={(e) => setEndHour(Number(e.target.value))}
                             className="flex-1 border-b border-gray-300 px-1 py-1 text-sm text-gray-800 focus:outline-none focus:border-gray-500"

@@ -38,18 +38,22 @@ export default function EventModal({ event, onClose }: Props) {
       {/* Modal */}
       <div className="fixed inset-0 flex items-center justify-center z-[9999]">
         <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="event-modal-title"
           className="relative bg-white rounded-xl shadow-xl p-6 w-96 border border-gray-200"
           onClick={(e) => e.stopPropagation()}
         >
           {/* Close button */}
           <button
             onClick={onClose}
+            aria-label="Close event details"
             className="absolute top-3 right-3 text-gray-600 hover:text-black text-lg"
           >
             ✕
           </button>
 
-          <h2 className="text-lg font-semibold text-gray-900 mb-2">
+          <h2 id="event-modal-title" className="text-lg font-semibold text-gray-900 mb-2">
             {event.title}
           </h2>
 

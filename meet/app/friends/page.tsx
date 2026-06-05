@@ -82,12 +82,14 @@ function SideBar({
               <div className="flex gap-2 mt-1.5">
                 <button
                   onClick={() => onAccept(person)}
+                  aria-label={`Accept friend request from ${person.name}`}
                   className="text-xs px-4 py-0.5 bg-gray-100 border border-gray-300 text-gray-600 rounded-full hover:bg-green-50 hover:border-green-400 hover:text-green-600 transition-colors"
                 >
                   Accept
                 </button>
                 <button
                   onClick={() => onDecline(person.username)}
+                  aria-label={`Decline friend request from ${person.name}`}
                   className="text-xs px-4 py-0.5 bg-gray-100 border border-gray-300 text-gray-600 rounded-full hover:bg-red-50 hover:border-red-400 hover:text-red-500 transition-colors"
                 >
                   Decline
@@ -184,11 +186,12 @@ export default function FriendsPage() {
                 {/* Activity button — mobile only */}
                 <button
                   onClick={() => setSidebarOpen(true)}
+                  aria-label={`Activity${pendingCount > 0 ? `, ${pendingCount} pending` : ""}`}
                   className="relative lg:hidden flex items-center gap-1.5 px-3 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 text-sm font-medium text-gray-700 rounded-full transition-colors"
                 >
                   Activity
                   {pendingCount > 0 && (
-                    <span className="w-4 h-4 text-[10px] flex items-center justify-center bg-red-500 text-white rounded-full">
+                    <span aria-hidden="true" className="w-4 h-4 text-[10px] flex items-center justify-center bg-red-500 text-white rounded-full">
                       {pendingCount}
                     </span>
                   )}
@@ -225,6 +228,7 @@ export default function FriendsPage() {
                             value={searchValue}
                             onChange={(e) => setSearchValue(e.target.value)}
                             placeholder="Search Users"
+                            aria-label="Search users to add as friends"
                             className="w-full border border-gray-300 rounded-lg pl-8 pr-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400"
                           />
                         </div>
@@ -254,6 +258,7 @@ export default function FriendsPage() {
                                   <button
                                     onClick={() => sendFriendRequest(user)}
                                     disabled={isSent}
+                                    aria-label={isSent ? `Friend request sent to ${user.name}` : `Send friend request to ${user.name}`}
                                     className="shrink-0 px-3 py-1 border border-gray-400 text-xs rounded-lg disabled:opacity-50 disabled:cursor-not-allowed"
                                   >
                                     {isSent ? "Sent" : "+ Add"}
@@ -288,6 +293,7 @@ export default function FriendsPage() {
                 </div>
                 <button
                   onClick={() => removeFriend(friend.username)}
+                  aria-label={`Remove ${friend.name} from friends`}
                   className="shrink-0 px-3 sm:w-20 py-1 border border-gray-400 text-xs text-gray-600 rounded-lg hover:bg-red-50 hover:border-red-300 hover:text-red-500 transition-colors"
                 >
                   Remove
