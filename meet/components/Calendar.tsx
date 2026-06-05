@@ -24,6 +24,8 @@ const DAYS = [
     "Sunday",
 ];
 
+const DAYS_SHORT = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
+
 const overlapColor = (count: number) => {
     if (count === 1) return "bg-green-200";
     if (count === 2) return "bg-green-400";
@@ -61,7 +63,6 @@ export default function Calendar({
         return map;
     }, [allSlots]);
 
-    // People whose availability is consumed by an event covering a given cell.
     const bookedPeopleAt = (dayIndex: number, hour: number) => {
         const ids = new Set<string>();
         for (const e of events) {
@@ -94,17 +95,20 @@ export default function Calendar({
     const getName = (slot: AvailabilitySlot) =>
         slot.personId === "me" ? "You" : (personMap[slot.personId]?.name ?? "");
 
+    const getShortName = (slot: AvailabilitySlot) => getName(slot).split(" ")[0];
+
     return (
-        <div className="flex-1 flex flex-col overflow-hidden bg-white">
+        <div className="flex-1 flex flex-col overflow-hidden bg-white w-full">
             {/* Header */}
-            <div className="flex">
-                <div className="w-20 border-r border-gray-300" />
-                {DAYS.map((day) => (
+            <div className="flex sticky top-0 z-20 bg-white shadow-sm">
+                <div className="w-10 sm:w-14 md:w-20 shrink-0 border-r border-gray-300 bg-gray-100" />
+                {DAYS.map((day, i) => (
                     <div
                         key={day}
-                        className="flex-1 border-r border-gray-300 px-4 py-3 bg-gray-100 text-center text-sm font-semibold text-gray-900"
+                        className="flex-1 min-w-0 border-r border-gray-300 px-0.5 sm:px-2 md:px-4 py-2 md:py-3 bg-gray-100 text-center text-[10px] sm:text-xs md:text-sm font-semibold text-gray-900"
                     >
-                        {day}
+                        <span className="md:hidden">{DAYS_SHORT[i]}</span>
+                        <span className="hidden md:block">{day}</span>
                     </div>
                 ))}
             </div>
@@ -113,10 +117,13 @@ export default function Calendar({
             <div className="flex-1 overflow-auto">
                 {HOURS.map((hour) => (
                     <div key={hour} className="flex border-b border-gray-300">
-                        {/* Time */}
-                        <div className="w-20 border-r border-gray-300 px-3 py-4 text-sm text-gray-800 bg-gray-50">
-                            {hour > 12 ? hour - 12 : hour}
-                            {hour >= 12 ? "pm" : "am"}
+                        {/* Time label */}
+                        <div className="w-10 sm:w-14 md:w-20 shrink-0 border-r border-gray-300 px-1 sm:px-2 md:px-3 py-2 md:py-4 text-[9px] sm:text-xs md:text-sm text-gray-800 bg-gray-50 flex items-start justify-end pr-1 sm:pr-2">
+                            <span>
+                                {hour > 12 ? hour - 12 : hour}
+                                <span className="hidden sm:inline">{hour >= 12 ? "pm" : "am"}</span>
+                                <span className="sm:hidden">{hour >= 12 ? "p" : "a"}</span>
+                            </span>
                         </div>
 
                         {/* Cells */}
@@ -128,7 +135,6 @@ export default function Calendar({
                                 (e) => e.dayIndex === dayIndex && hour >= e.startHour && hour < e.endHour
                             );
 
-                            // Label a person on the first VISIBLE green cell of each run.
                             const visibleNow = cellEvents.length
                                 ? new Set<string>()
                                 : new Set(slots.map((s) => s.personId));
@@ -159,7 +165,7 @@ export default function Calendar({
                             return (
                                 <div
                                     key={`${dayIndex}-${hour}`}
-                                    className={`flex-1 border-r border-gray-300 relative h-16 transition-colors ${roundingClass} ${
+                                    className={`flex-1 min-w-0 border-r border-gray-300 relative h-10 sm:h-12 md:h-16 transition-colors ${roundingClass} ${
                                         showAvailability && hasContent
                                             ? overlapColor(slots.length)
                                             : "bg-white"
@@ -168,9 +174,10 @@ export default function Calendar({
                                     {showAvailability && namesToShow.map((slot) => (
                                         <div
                                             key={slot.personId}
-                                            className="text-[10px] text-gray-800 px-1 pt-1 truncate font-semibold leading-tight"
+                                            className="text-[7px] sm:text-[10px] md:text-xs text-gray-800 px-0.5 sm:px-1 pt-0.5 sm:pt-1 truncate font-semibold leading-tight"
                                         >
-                                            {getName(slot)}
+                                            <span className="sm:hidden">{getShortName(slot)}</span>
+                                            <span className="hidden sm:inline">{getName(slot)}</span>
                                         </div>
                                     ))}
 
@@ -188,7 +195,7 @@ export default function Calendar({
                                                 }`}
                                             >
                                                 {isStart && (
-                                                    <span className="block text-[10px] text-white px-1 pt-0.5 font-semibold truncate">
+                                                    <span className="block text-[7px] sm:text-[10px] md:text-xs text-white px-0.5 sm:px-1 pt-0.5 font-semibold truncate">
                                                         {e.title}
                                                     </span>
                                                 )}
