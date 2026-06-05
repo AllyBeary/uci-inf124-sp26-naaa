@@ -21,3 +21,12 @@ export interface CalendarEvent {
   description?: string;
   availablePeople?: string[]; // personIds
 }
+
+export interface LocalCalendarEvent {
+  id: string;
+  title: string;
+  dayIndex: number;
+  startHour: number;
+  endHour: number;
+  invitees: string[];
+}

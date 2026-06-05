@@ -17,7 +17,10 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ slots });
   } catch (error) {
     console.error("Error in GET /api/availability:", error);
-    return NextResponse.json({ error: "Failed to fetch availability" }, { status: 500 });
+    return NextResponse.json(
+        { error: "Failed to fetch availability", detail: error instanceof Error ? error.message : String(error) },
+        { status: 500 }
+    );
   }
 }
 

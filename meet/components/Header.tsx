@@ -6,8 +6,8 @@ export default function Header() {
   return (
     <div className="flex items-center justify-between h-16 px-6 bg-white border-b border-gray-200">
       {/* Left side - Logo */}
-      <div className="flex items-center gap-4">
-        <div className="w-10 h-10 bg-gray-300 rounded-full"></div>
+      <div className="w-10 h-10 bg-gray-300 rounded-full flex items-center justify-center">
+        <span className="text-sm font-bold text-gray-700">AP</span>
       </div>
 
       {/* Right side - Icons */}
