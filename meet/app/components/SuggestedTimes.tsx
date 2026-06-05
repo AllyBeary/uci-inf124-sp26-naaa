@@ -1,6 +1,6 @@
 "use client";
 
-import { SuggestedTime } from "../app/lib/suggestTimes";
+import { SuggestedTime } from "../lib/suggestTimes";
 
 const fmt = (h: number) => {
     const period = h >= 12 ? "pm" : "am";

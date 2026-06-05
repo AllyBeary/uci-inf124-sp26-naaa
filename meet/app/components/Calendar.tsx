@@ -1,8 +1,8 @@
 "use client";
 
 import { useMemo } from "react";
-import { people, availabilitySlots } from "../app/lib/userData";
-import { AvailabilitySlot, LocalCalendarEvent } from "../app/lib/types";
+import { people, availabilitySlots } from "../lib/userData";
+import { AvailabilitySlot, LocalCalendarEvent } from "../lib/types";
 
 type CalendarProps = {
     selectedPeople: string[];

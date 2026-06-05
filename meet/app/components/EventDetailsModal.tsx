@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { LocalCalendarEvent } from "../app/lib/types";
+import { LocalCalendarEvent } from "../lib/types";
 
 const HOURS = Array.from({ length: 10 }, (_, i) => i + 8); // 8am..5pm
 const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];

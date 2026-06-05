@@ -1,7 +1,7 @@
 "use client";
 
-import type { CalendarEvent } from "@/lib/types";
-import { people } from "@/lib/userData";
+import type { CalendarEvent } from "../lib/types";
+import { people } from "../lib/userData";
 
 type Props = {
   event: CalendarEvent;

@@ -3,9 +3,9 @@
 import MiniCalendar from "./MiniCalendar";
 import AvailabilityFilter from "./AvailabilityFilter";
 import SuggestedTimes from "./SuggestedTimes";
-import { people as allPeople } from "../app/lib/userData";
-import { Person } from "../app/lib/types";
-import { SuggestedTime } from "../app/lib/suggestTimes";
+import { people as allPeople } from "../lib/userData";
+import { Person } from "../lib/types";
+import { SuggestedTime } from "../lib/suggestTimes";
 
 type SidebarProps = {
     selectedPeople: string[];

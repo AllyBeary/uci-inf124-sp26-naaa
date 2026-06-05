@@ -1,6 +1,6 @@
 "use client";
 
-import { Person } from "../app/lib/types";
+import { Person } from "../lib/types";
 
 type AvailabilityFilterProps = {
   people: Person[];
