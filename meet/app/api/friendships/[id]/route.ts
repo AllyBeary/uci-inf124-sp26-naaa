@@ -4,8 +4,9 @@ import { Friendship } from "@/app/api/mongo-db/friendship.model";
 
 // PATCH /api/friendships/[id]
 // Body: { status: "accepted" | "declined" }
-export async function PATCH(request: NextRequest, { params }: { params: { id: string } }) {
+export async function PATCH(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;  // await params first
     await connectDB();
 
     const { status } = await request.json();
@@ -15,11 +16,11 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
     }
 
     const friendship = await Friendship.findByIdAndUpdate(
-      params.id,
+      id,  // use destructured id
       { status },
       { new: true }
     );
-
+    
     if (!friendship) {
       return NextResponse.json({ error: "Friendship not found" }, { status: 404 });
     }
@@ -32,11 +33,12 @@ export async function PATCH(request: NextRequest, { params }: { params: { id: st
 }
 
 // DELETE /api/friendships/[id]
-export async function DELETE(request: NextRequest, { params }: { params: { id: string } }) {
+export async function DELETE(request: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   try {
+    const { id } = await params;  // await params first
     await connectDB();
 
-    const friendship = await Friendship.findByIdAndDelete(params.id);
+    const friendship = await Friendship.findByIdAndDelete(id);
 
     if (!friendship) {
       return NextResponse.json({ error: "Friendship not found" }, { status: 404 });
