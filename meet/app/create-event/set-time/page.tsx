@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
-import { people } from "@/lib/userData";
+import { people } from "../../lib/userData";
 
 function generateTimeOptions() {
     const options: { label: string; value: number }[] = [];

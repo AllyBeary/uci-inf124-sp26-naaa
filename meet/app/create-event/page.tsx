@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import Sidebar from "@/components/Sidebar";
-import { people } from "@/lib/userData";
+import { people } from "../lib/userData";
 
 const MONTH_NAMES = [
     "January", "February", "March", "April", "May", "June",

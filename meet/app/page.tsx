@@ -6,7 +6,7 @@ import Header from "@/components/Header";
 import MiniCalendar from "@/components/MiniCalendar";
 import Calendar from "@/components/Calendar";
 import { useState, useEffect, useMemo } from "react";
-import { LocalCalendarEvent } from "@/lib/types";
+import { LocalCalendarEvent } from "./lib/types";
 
 type CalendarGroup = {
   _id: string;

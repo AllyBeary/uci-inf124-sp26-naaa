@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Header from "@/components/Header";
 import CalendarConfirmationModal from "@/components/CalendarConfirmationModal";
-import { people as availablePeople } from "@/lib/userData";
+import { people as availablePeople } from "../lib/userData";
 
 export default function CreateCalendarPage() {
   const router = useRouter();

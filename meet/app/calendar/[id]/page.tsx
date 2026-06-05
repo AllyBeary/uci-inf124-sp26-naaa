@@ -8,10 +8,10 @@ import Calendar from "@/components/Calendar";
 import AddAvailabilityModal from "@/components/AddAvailabilityModal";
 import CreateEventModal from "@/components/CreateEventModal";
 import EventDetailsModal from "@/components/EventDetailsModal";
-import { people as allPeople, availabilitySlots } from "@/lib/userData";
-import { AvailabilitySlot, Person, LocalCalendarEvent } from "@/lib/types";
-import { suggestTimes } from "@/lib/suggestTimes";
-import type { SuggestedTime } from "@/lib/suggestTimes";
+import { people as allPeople, availabilitySlots } from "../../lib/userData";
+import { AvailabilitySlot, Person, LocalCalendarEvent } from "../../lib/types";
+import { suggestTimes } from "../../lib/suggestTimes";
+import type { SuggestedTime } from "../../lib/suggestTimes";
 import { HiMenu, HiX } from "react-icons/hi";
 
 const HOURS = Array.from({ length: 10 }, (_, i) => i + 8); // 8am..5pm
