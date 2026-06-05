@@ -1,7 +1,7 @@
 "use client";
 import { useState } from "react";
 import { BsPersonCircle } from "react-icons/bs";
-import Header from "@/components/Header";
+import Header from "../components/Header";
 import { HiMagnifyingGlass } from "react-icons/hi2";
 
 //Hard coded data (replace later)

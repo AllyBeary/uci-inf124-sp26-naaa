@@ -1,8 +1,8 @@
 "use client";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Header from "@/components/Header";
-import CalendarConfirmationModal from "@/components/CalendarConfirmationModal";
+import Header from "../components/Header";
+import CalendarConfirmationModal from "../components/CalendarConfirmationModal";
 import { people as availablePeople } from "../lib/userData";
 
 export default function CreateCalendarPage() {

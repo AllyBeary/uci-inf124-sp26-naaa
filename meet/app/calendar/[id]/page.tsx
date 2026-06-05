@@ -2,12 +2,12 @@
 
 import { useState, useEffect, useMemo } from "react";
 import { useParams } from "next/navigation";
-import Header from "@/components/Header";
-import Sidebar from "@/components/Sidebar";
-import Calendar from "@/components/Calendar";
-import AddAvailabilityModal from "@/components/AddAvailabilityModal";
-import CreateEventModal from "@/components/CreateEventModal";
-import EventDetailsModal from "@/components/EventDetailsModal";
+import Header from "../../components/Header";
+import Sidebar from "../../components/Sidebar";
+import Calendar from "../../components/Calendar";
+import AddAvailabilityModal from "../../components/AddAvailabilityModal";
+import CreateEventModal from "../../components/CreateEventModal";
+import EventDetailsModal from "../../components/EventDetailsModal";
 import { people as allPeople, availabilitySlots } from "../../lib/userData";
 import { AvailabilitySlot, Person, LocalCalendarEvent } from "../../lib/types";
 import { suggestTimes } from "../../lib/suggestTimes";

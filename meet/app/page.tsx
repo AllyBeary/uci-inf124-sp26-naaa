@@ -2,9 +2,9 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import Header from "@/components/Header";
-import MiniCalendar from "@/components/MiniCalendar";
-import Calendar from "@/components/Calendar";
+import Header from "./components/Header";
+import MiniCalendar from "./components/MiniCalendar";
+import Calendar from "./components/Calendar";
 import { useState, useEffect, useMemo } from "react";
 import { LocalCalendarEvent } from "./lib/types";
 
