@@ -58,12 +58,14 @@ export default function MiniCalendar({
         <div className="flex gap-1">
           <button
             onClick={handlePrevMonth}
+            aria-label="Previous month"
             className="p-1 hover:bg-gray-200 rounded text-gray-600"
           >
             ‹
           </button>
           <button
             onClick={handleNextMonth}
+            aria-label="Next month"
             className="p-1 hover:bg-gray-200 rounded text-gray-600"
           >
             ›
@@ -72,26 +74,31 @@ export default function MiniCalendar({
       </div>
 
       {/* Calendar days */}
-      <div className="grid grid-cols-7 gap-1">
-        {days.map((day, index) => (
-          <button
-            key={index}
-            onClick={() => day && onDateChange(new Date(year, month, day))}
-            className={`aspect-square text-xs rounded flex items-center justify-center
-              ${
-                day === null
-                  ? ""
-                  : day === currentDate.getDate() &&
-                    month === currentDate.getMonth() &&
-                    year === currentDate.getFullYear()
+      <div className="grid grid-cols-7 gap-1" role="grid" aria-label={`${monthNames[month]} ${year}`}>
+        {days.map((day, index) => {
+          const isSelected =
+            day !== null &&
+            day === currentDate.getDate() &&
+            month === currentDate.getMonth() &&
+            year === currentDate.getFullYear();
+          return day === null ? (
+            <div key={index} aria-hidden="true" />
+          ) : (
+            <button
+              key={index}
+              onClick={() => onDateChange(new Date(year, month, day))}
+              aria-label={`${monthNames[month]} ${day}, ${year}`}
+              aria-current={isSelected ? "date" : undefined}
+              className={`aspect-square text-xs rounded flex items-center justify-center ${
+                isSelected
                   ? "bg-gray-400 text-white font-semibold"
                   : "hover:bg-gray-200 text-gray-700"
-              }
-            `}
-          >
-            {day}
-          </button>
-        ))}
+              }`}
+            >
+              {day}
+            </button>
+          );
+        })}
       </div>
     </div>
   );

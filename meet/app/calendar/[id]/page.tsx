@@ -10,9 +10,18 @@ import CreateEventModal from "@/components/CreateEventModal";
 import EventDetailsModal from "@/components/EventDetailsModal";
 import { people as allPeople, availabilitySlots } from "@/lib/userData";
 import { AvailabilitySlot, Person, LocalCalendarEvent } from "@/lib/types";
-import { suggestTimes, SuggestedTime } from "@/lib/suggestTimes";
+import { suggestTimes } from "@/lib/suggestTimes";
+import type { SuggestedTime } from "@/lib/suggestTimes";
+import { HiMenu, HiX } from "react-icons/hi";
 
 const HOURS = Array.from({ length: 10 }, (_, i) => i + 8); // 8am..5pm
+const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
+
+interface EventDraft {
+    dayIndex: number;
+    startHour: number;
+    endHour: number;
+}
 
 export default function CalendarPage() {
     const { id: groupId } = useParams<{ id: string }>();
@@ -23,8 +32,9 @@ export default function CalendarPage() {
     const [mySlots, setMySlots] = useState<AvailabilitySlot[]>([]);
     const [showModal, setShowModal] = useState(false);
     const [events, setEvents] = useState<LocalCalendarEvent[]>([]);
-    const [eventDraft, setEventDraft] = useState<SuggestedTime | null>(null);
+    const [eventDraft, setEventDraft] = useState<EventDraft | null>(null);
     const [selectedEvent, setSelectedEvent] = useState<LocalCalendarEvent | null>(null);
+    const [sidebarOpen, setSidebarOpen] = useState(false);
 
     // Fetch group members; fall back to all hardcoded people for static groups
     useEffect(() => {
@@ -66,27 +76,19 @@ export default function CalendarPage() {
             .catch(console.error);
     }, [groupId]);
 
+    // Fetch events for this group from the database
     useEffect(() => {
         if (!groupId) return;
-        try {
-            const stored = localStorage.getItem(`events:${groupId}`);
-            setEvents(stored ? JSON.parse(stored) : []);
-        } catch (err) {
-            console.error("Failed to load events:", err);
-            setEvents([]);
-        }
+        fetch(`/api/events?groupId=${groupId}`)
+            .then((r) => r.json())
+            .then(({ events: fetched }) => {
+                if (Array.isArray(fetched)) setEvents(fetched);
+            })
+            .catch((err) => {
+                console.error("Failed to load events:", err);
+                setEvents([]);
+            });
     }, [groupId]);
-
-    const saveEvents = (next: LocalCalendarEvent[]) => {
-        setEvents(next);
-        if (groupId) {
-            try {
-                localStorage.setItem(`events:${groupId}`, JSON.stringify(next));
-            } catch (err) {
-                console.error("Failed to save events:", err);
-            }
-        }
-    };
 
     const slotsForSuggest = useMemo(
         () => [
@@ -105,7 +107,7 @@ export default function CalendarPage() {
             startHour,
             endHour,
         }));
-        setMySlots((prev) => [...prev, ...newSlots]);
+        setMySlots((prev: AvailabilitySlot[]) => [...prev, ...newSlots]);
 
         if (groupId) {
             try {
@@ -123,52 +125,121 @@ export default function CalendarPage() {
         }
     };
 
-    const handleSaveEvent = ({
-                                 title,
-                                 startHour,
-                                 endHour,
-                             }: {
+    const handleSaveEvent = async ({
+        title,
+        startHour,
+        endHour,
+    }: {
         title: string;
         startHour: number;
         endHour: number;
     }) => {
-        const dayIndex = (currentDate.getDay() + 6) % 7; // JS Sun=0 -> our Mon=0
-        saveEvents([
-            ...events,
-            { id: `${Date.now()}`, title, dayIndex, startHour, endHour, invitees: [] },
-        ]);
+        // dayIndex comes from the draft (cell click or suggestion), not from currentDate
+        const dayIndex = eventDraft?.dayIndex ?? (currentDate.getDay() + 6) % 7;
+        try {
+            const res = await fetch("/api/events", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ groupId, title, dayIndex, startHour, endHour }),
+            });
+            const data = await res.json();
+            if (!res.ok) {
+                console.error("Event creation failed:", data);
+                alert(`Could not save event: ${data?.detail ?? data?.error ?? "Unknown error"}`);
+                return;
+            }
+            if (data.event) setEvents((prev: LocalCalendarEvent[]) => [...prev, data.event]);
+        } catch (err) {
+            console.error("Failed to save event:", err);
+            alert("Network error — could not save event.");
+        }
     };
 
-    const handleUpdateEvent = (updated: { startHour: number; endHour: number }) => {
+    const handleUpdateEvent = async (updated: { startHour: number; endHour: number }) => {
         if (!selectedEvent) return;
-        saveEvents(events.map((e) => (e.id === selectedEvent.id ? { ...e, ...updated } : e)));
+        try {
+            await fetch(`/api/events/${selectedEvent.id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ ...updated, dayIndex: selectedEvent.dayIndex }),
+            });
+            setEvents((prev: LocalCalendarEvent[]) =>
+                prev.map((e: LocalCalendarEvent) => (e.id === selectedEvent.id ? { ...e, ...updated } : e))
+            );
+        } catch (err) {
+            console.error("Failed to update event:", err);
+        }
     };
 
-    const handleDeleteEvent = () => {
+    const handleDeleteEvent = async () => {
         if (!selectedEvent) return;
-        saveEvents(events.filter((e) => e.id !== selectedEvent.id));
+        try {
+            await fetch(`/api/events/${selectedEvent.id}`, { method: "DELETE" });
+            setEvents((prev: LocalCalendarEvent[]) => prev.filter((e: LocalCalendarEvent) => e.id !== selectedEvent.id));
+            setSelectedEvent(null);
+        } catch (err) {
+            console.error("Failed to delete event:", err);
+        }
     };
+
+    const sidebar = (
+        <Sidebar
+            people={groupPeople}
+            selectedPeople={selectedPeople}
+            onSelectedPeopleChange={setSelectedPeople}
+            currentDate={currentDate}
+            onCurrentDateChange={setCurrentDate}
+            onAddAvailability={() => setShowModal(true)}
+            suggestions={suggestions}
+            onAddSuggestion={(s: SuggestedTime) => setEventDraft({
+                dayIndex: (currentDate.getDay() + 6) % 7,
+                startHour: s.startHour,
+                endHour: s.endHour,
+            })}
+        />
+    );
 
     return (
         <div className="flex flex-col h-screen bg-white">
             <Header />
-            <div className="flex flex-1 overflow-hidden">
-                <Sidebar
-                    people={groupPeople}
-                    selectedPeople={selectedPeople}
-                    onSelectedPeopleChange={setSelectedPeople}
-                    currentDate={currentDate}
-                    onCurrentDateChange={setCurrentDate}
-                    onAddAvailability={() => setShowModal(true)}
-                    suggestions={suggestions}
-                    onAddSuggestion={(s) => setEventDraft(s)}
-                />
+            <div className="flex flex-1 overflow-hidden relative">
+                {/* Sidebar — hidden on mobile, always visible on sm+ */}
+                <div className="hidden sm:flex">
+                    {sidebar}
+                </div>
+
+                {/* Mobile sidebar overlay */}
+                {sidebarOpen && (
+                    <>
+                        <div
+                            className="fixed inset-0 z-30 bg-black/30 sm:hidden"
+                            onClick={() => setSidebarOpen(false)}
+                        />
+                        <div className="fixed left-0 top-16 bottom-0 z-40 sm:hidden">
+                            {sidebar}
+                        </div>
+                    </>
+                )}
+
                 <Calendar
                     selectedPeople={selectedPeople}
                     mySlots={mySlots}
                     events={events}
                     onEventClick={setSelectedEvent}
+                    onCellClick={(dayIndex, startHour) =>
+                        setEventDraft({ dayIndex, startHour, endHour: Math.min(startHour + 1, 17) })
+                    }
+                    currentDate={currentDate}
                 />
+
+                {/* Mobile toggle button */}
+                <button
+                    className="sm:hidden fixed bottom-4 left-4 z-30 bg-white border border-gray-300 rounded-full p-3 shadow-lg text-gray-700"
+                    onClick={() => setSidebarOpen((v: boolean) => !v)}
+                    aria-label="Toggle sidebar"
+                >
+                    {sidebarOpen ? <HiX size={20} /> : <HiMenu size={20} />}
+                </button>
             </div>
 
             {showModal && (
@@ -177,7 +248,7 @@ export default function CalendarPage() {
 
             {eventDraft && (
                 <CreateEventModal
-                    date={currentDate}
+                    dayName={DAYS[eventDraft.dayIndex]}
                     initialStart={eventDraft.startHour}
                     initialEnd={eventDraft.endHour}
                     onSave={handleSaveEvent}

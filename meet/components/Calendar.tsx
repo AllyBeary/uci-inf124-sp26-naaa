@@ -9,21 +9,14 @@ type CalendarProps = {
     mySlots?: AvailabilitySlot[];
     events?: LocalCalendarEvent[];
     onEventClick?: (event: LocalCalendarEvent) => void;
+    onCellClick?: (dayIndex: number, startHour: number) => void;
     showAvailability?: boolean;
+    currentDate?: Date;
 };
 
 const HOURS = Array.from({ length: 10 }, (_, i) => i + 8);
 
-const DAYS = [
-    "Monday",
-    "Tuesday",
-    "Wednesday",
-    "Thursday",
-    "Friday",
-    "Saturday",
-    "Sunday",
-];
-
+const DAYS = ["Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday"];
 const DAYS_SHORT = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
 
 const overlapColor = (count: number) => {
@@ -33,17 +26,45 @@ const overlapColor = (count: number) => {
     return "bg-green-800";
 };
 
+// Return the Monday of the week containing `date`
+function getWeekMonday(date: Date): Date {
+    const d = new Date(date);
+    const day = d.getDay(); // 0=Sun … 6=Sat
+    const offset = day === 0 ? -6 : 1 - day;
+    d.setDate(d.getDate() + offset);
+    d.setHours(0, 0, 0, 0);
+    return d;
+}
+
 export default function Calendar({
     selectedPeople,
     mySlots = [],
     events = [],
     onEventClick,
+    onCellClick,
     showAvailability = true,
+    currentDate,
 }: CalendarProps) {
     const personMap = useMemo(
         () => Object.fromEntries(people.map((p) => [p.id, p])),
         []
     );
+
+    // Compute actual dates for each column based on the selected week
+    const weekDates = useMemo(() => {
+        const monday = getWeekMonday(currentDate ?? new Date());
+        return DAYS.map((_, i) => {
+            const d = new Date(monday);
+            d.setDate(monday.getDate() + i);
+            return d;
+        });
+    }, [currentDate]);
+
+    // Index (0=Mon…6=Sun) of the currently selected date
+    const selectedDayIndex = useMemo(() => {
+        if (!currentDate) return -1;
+        return (currentDate.getDay() + 6) % 7;
+    }, [currentDate]);
 
     const hardcodedSlots: AvailabilitySlot[] = availabilitySlots.filter((slot) =>
         selectedPeople.includes(slot.personId)
@@ -102,15 +123,26 @@ export default function Calendar({
             {/* Header */}
             <div className="flex sticky top-0 z-20 bg-white shadow-sm">
                 <div className="w-10 sm:w-14 md:w-20 shrink-0 border-r border-gray-300 bg-gray-100" />
-                {DAYS.map((day, i) => (
-                    <div
-                        key={day}
-                        className="flex-1 min-w-0 border-r border-gray-300 px-0.5 sm:px-2 md:px-4 py-2 md:py-3 bg-gray-100 text-center text-[10px] sm:text-xs md:text-sm font-semibold text-gray-900"
-                    >
-                        <span className="md:hidden">{DAYS_SHORT[i]}</span>
-                        <span className="hidden md:block">{day}</span>
-                    </div>
-                ))}
+                {weekDates.map((date, i) => {
+                    const isSelected = selectedDayIndex === i;
+                    const label = `${date.getMonth() + 1}/${date.getDate()}`;
+                    return (
+                        <div
+                            key={DAYS[i]}
+                            className={`flex-1 min-w-0 border-r border-gray-300 px-0.5 sm:px-2 md:px-4 py-1.5 md:py-2 text-center transition-colors ${
+                                isSelected ? "bg-blue-50 border-b-2 border-b-blue-400" : "bg-gray-100"
+                            }`}
+                        >
+                            <div className={`text-[10px] sm:text-xs md:text-sm font-semibold ${isSelected ? "text-blue-700" : "text-gray-900"}`}>
+                                <span className="md:hidden">{DAYS_SHORT[i]}</span>
+                                <span className="hidden md:inline">{DAYS[i]}</span>
+                            </div>
+                            <div className={`text-[9px] sm:text-[10px] md:text-xs mt-0.5 ${isSelected ? "text-blue-500 font-medium" : "text-gray-400"}`}>
+                                {label}
+                            </div>
+                        </div>
+                    );
+                })}
             </div>
 
             {/* Grid */}
@@ -128,6 +160,7 @@ export default function Calendar({
 
                         {/* Cells */}
                         {DAYS.map((_, dayIndex) => {
+                            const isSelected = selectedDayIndex === dayIndex;
                             const slots = getSlotsInCell(dayIndex, hour);
                             const hasContent = slots.length > 0;
 
@@ -162,12 +195,20 @@ export default function Calendar({
                                 ? `${!prevHasSamePeople ? "rounded-t-md" : ""} ${!nextHasSamePeople ? "rounded-b-md" : ""}`
                                 : "";
 
+                            const isClickable = !!onCellClick && cellEvents.length === 0;
                             return (
                                 <div
                                     key={`${dayIndex}-${hour}`}
-                                    className={`flex-1 min-w-0 border-r border-gray-300 relative h-10 sm:h-12 md:h-16 transition-colors ${roundingClass} ${
+                                    role={isClickable ? "button" : undefined}
+                                    tabIndex={isClickable ? 0 : undefined}
+                                    aria-label={isClickable ? `Add event on ${DAYS[dayIndex]} at ${hour > 12 ? hour - 12 : hour}${hour >= 12 ? "pm" : "am"}` : undefined}
+                                    onClick={() => { if (cellEvents.length === 0) onCellClick?.(dayIndex, hour); }}
+                                    onKeyDown={(e) => { if (isClickable && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); onCellClick!(dayIndex, hour); } }}
+                                    className={`flex-1 min-w-0 border-r border-gray-300 relative h-10 sm:h-12 md:h-16 transition-colors ${roundingClass} ${isClickable ? "cursor-pointer" : ""} ${
                                         showAvailability && hasContent
                                             ? overlapColor(slots.length)
+                                            : isSelected
+                                            ? "bg-blue-50/40"
                                             : "bg-white"
                                     }`}
                                 >

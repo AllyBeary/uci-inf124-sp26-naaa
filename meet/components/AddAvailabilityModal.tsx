@@ -30,18 +30,25 @@ export default function AddAvailabilityModal({ onConfirm, onClose }: Props) {
 
   return (
     <>
-      <div className="fixed inset-0 bg-black/30 z-40" onClick={onClose} />
+      <div className="fixed inset-0 bg-black/30 z-40" onClick={onClose} aria-hidden="true" />
       <div className="fixed inset-0 flex items-center justify-center z-50 pointer-events-none">
-        <div className="bg-white rounded-xl shadow-lg p-6 w-96 pointer-events-auto">
-          <h2 className="text-lg font-semibold text-gray-900 mb-4">Add Your Availability</h2>
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="add-avail-title"
+          className="bg-white rounded-xl shadow-lg p-6 w-96 pointer-events-auto"
+        >
+          <h2 id="add-avail-title" className="text-lg font-semibold text-gray-900 mb-4">Add Your Availability</h2>
 
           {/* Add by DAYS OF THE WEEK */}
-          <p className="text-sm text-gray-600 mb-2">Days</p>
-          <div className="flex flex-wrap gap-2 mb-5">
+          <p className="text-sm text-gray-600 mb-2" id="days-label">Days</p>
+          <div role="group" aria-labelledby="days-label" className="flex flex-wrap gap-2 mb-5">
             {DAYS.map((day, i) => (
               <button
                 key={day}
                 onClick={() => toggleDay(i)}
+                aria-pressed={selectedDays.includes(i)}
+                aria-label={day}
                 className={`px-3 py-1 rounded-full text-sm border transition-colors ${
                   selectedDays.includes(i)
                     ? "bg-green-600 text-white border-green-600"
@@ -56,8 +63,9 @@ export default function AddAvailabilityModal({ onConfirm, onClose }: Props) {
           {/* Selecting Time */}
           <div className="flex gap-4 mb-6">
             <div className="flex-1">
-              <label className="text-sm text-gray-600 block mb-1">Start Time</label>
+              <label htmlFor="avail-start" className="text-sm text-gray-600 block mb-1">Start Time</label>
               <select
+                id="avail-start"
                 value={startHour}
                 onChange={(e) => {
                   const val = Number(e.target.value);
@@ -72,8 +80,9 @@ export default function AddAvailabilityModal({ onConfirm, onClose }: Props) {
               </select>
             </div>
             <div className="flex-1">
-              <label className="text-sm text-gray-600 block mb-1">End Time</label>
+              <label htmlFor="avail-end" className="text-sm text-gray-600 block mb-1">End Time</label>
               <select
+                id="avail-end"
                 value={endHour}
                 onChange={(e) => setEndHour(Number(e.target.value))}
                 className="w-full border border-gray-300 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-gray-400"
