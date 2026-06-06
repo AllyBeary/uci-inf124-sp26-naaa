@@ -1,154 +1,82 @@
 "use client";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import Header from "../components/Header";
-import MiniCalendar from "../components/MiniCalendar";
-import Calendar from "../components/Calendar";
-import { useState, useEffect, useMemo } from "react";
-import { LocalCalendarEvent } from "../lib/types";
+import { BsPersonCircle } from "react-icons/bs";
+import { useState } from "react";
 
-type CalendarGroup = {
-  _id: string;
-  name: string;
-  owner: string | null;
-};
-
-type GroupEvent = {
-  id: string;
-  title: string;
-  dayIndex: number;
-  startHour: number;
-  endHour: number;
-  groupId: string;
-  groupName: string;
-};
-
-const STATIC_GROUP: CalendarGroup = {
-  _id: "inf124-group",
-  name: "INF 124 Group",
-  owner: "Nicole Saengsouvanna",
-};
+export const calendarEvents = [
+    {
+        id: 1,
+        title: "Thursday Hangouts",
+        owner: "Audrey Phung",
+        username: "audreyp4",
+    },
+    {
+        id: 2,
+        title: "Weekly Meetings w/ Project Team",
+        owner: "Anver Chou",
+        username: "anverc",
+    },
+    {
+        id: 3,
+        title: "INF 124 Group",
+        owner: "Nicole Saengsouvanna",
+        username: "saengson",
+    },
+    {
+        id: 4,
+        title: "Study Sessions",
+        owner: "Ethan Votran",
+        username: "evotran",
+    },
+];
 
 export default function HomePage() {
-  const router = useRouter();
-  const [currentDate, setCurrentDate] = useState(new Date());
-  const [calendars, setCalendars] = useState<CalendarGroup[]>([STATIC_GROUP]);
-  const [allEvents, setAllEvents] = useState<GroupEvent[]>([]);
-
-  // Fetch all groups
-  useEffect(() => {
-    fetch("/api/calendar-groups")
-      .then((r) => r.json())
-      .then(({ groups }) => {
-        if (Array.isArray(groups)) setCalendars([STATIC_GROUP, ...groups]);
-      })
-      .catch(console.error);
-  }, []);
-
-  // Fetch events for every real (DB-backed) group
-  useEffect(() => {
-    const dbGroups = calendars.filter((g) => g._id !== "inf124-group");
-    if (dbGroups.length === 0) return;
-
-    Promise.all(
-      dbGroups.map((group) =>
-        fetch(`/api/events?groupId=${group._id}`)
-          .then((r) => r.json())
-          .then(({ events }) =>
-            Array.isArray(events)
-              ? (events as Omit<GroupEvent, "groupId" | "groupName">[]).map((e) => ({
-                  ...e,
-                  groupId: group._id,
-                  groupName: group.name,
-                }))
-              : []
-          )
-          .catch(() => [] as GroupEvent[])
-      )
-    ).then((results) => setAllEvents(results.flat()));
-  }, [calendars]);
-
-  // Convert to the shape Calendar expects
-  const calendarEvents = useMemo<LocalCalendarEvent[]>(
-    () =>
-      allEvents.map((e) => ({
-        id: e.id,
-        title: e.title,
-        dayIndex: e.dayIndex,
-        startHour: e.startHour,
-        endHour: e.endHour,
-        invitees: [],
-      })),
-    [allEvents]
-  );
-
-  // Map event id → groupId so we can navigate on click
-  const eventGroupMap = useMemo(
-    () => Object.fromEntries(allEvents.map((e) => [e.id, e.groupId])),
-    [allEvents]
-  );
-
-  const handleEventClick = (event: LocalCalendarEvent) => {
-    const groupId = eventGroupMap[event.id];
-    if (groupId) router.push(`/calendar/${groupId}`);
-  };
-
+  const [calendars, setCalendars] = useState(calendarEvents);
   return (
-    <div className="flex flex-col h-screen bg-white">
+    <div className="flex flex-col min-h-screen bg-white">
       <Header />
-
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left sidebar — mini calendar + group list */}
-        <div className="hidden sm:flex w-44 shrink-0 bg-gray-50 border-r border-gray-200 flex-col overflow-y-auto">
-          <MiniCalendar currentDate={currentDate} onDateChange={setCurrentDate} />
-
-          {/* Group list in sidebar */}
-          <div className="p-3 border-t border-gray-200">
-            <p className="text-[10px] font-semibold uppercase tracking-widest text-gray-400 mb-2 px-1">
-              Calendars
-            </p>
-            {calendars.map((n) => (
-              <Link
-                key={n._id}
-                href={`/calendar/${n._id}`}
-                className="flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-gray-200 transition-colors text-gray-700 group"
-              >
-                <span className="w-2 h-2 rounded-full bg-indigo-400 shrink-0" />
-                <span className="text-xs truncate">{n.name}</span>
+      <div className="flex flex-1">
+        <div className="flex-1 p-4 sm:p-6 sm:pl-8">
+          <div className="mb-4">
+            <div className="flex items-center justify-between mb-4">
+              <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+                Calendars
+              </h1>
+              <Link href="/create-calendar"className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 text-sm font-medium text-gray-700 rounded-full transition-colors">
+                <span className="text-lg leading-none">+</span>
+                New Calendar
               </Link>
-            ))}
-            <Link
-              href="/create-calendar"
-              className="flex items-center gap-2 px-2 py-1.5 mt-1 rounded-lg hover:bg-gray-200 transition-colors text-gray-400 text-xs"
-            >
-              <span className="text-base leading-none">+</span>
-              New Calendar
-            </Link>
-          </div>
-        </div>
+            </div>
 
-        {/* Main area */}
-        <div className="flex-1 flex flex-col overflow-hidden">
-          {/* My Calendar heading */}
-          <div className="px-4 sm:px-6 pt-4 pb-2 flex items-center justify-between shrink-0">
-            <h1 className="text-lg sm:text-xl font-bold text-gray-900">My Calendar</h1>
-            <Link
-              href="/create-calendar"
-              className="sm:hidden flex items-center gap-1 px-3 py-1.5 bg-gray-100 hover:bg-gray-200 border border-gray-300 text-xs font-medium text-gray-700 rounded-full transition-colors"
-            >
-              <span>+</span> New Calendar
-            </Link>
-          </div>
-
-          {/* Personal calendar grid — same component as shared calendar, no availability overlay */}
-          <div className="flex flex-1 min-h-0">
-            <Calendar
-              selectedPeople={[]}
-              events={calendarEvents}
-              currentDate={currentDate}
-              showAvailability={false}
-              onEventClick={handleEventClick}
-            />
+            <div className="grid grid-cols-4 gap-4">
+              {calendars.map((n) => (
+                <div key={n.id} className="flex flex-col border border-gray-200 rounded-xl overflow-hidden">
+                  <div className="p-4 flex-1">
+                    <h2 className="text-sm font-semibold text-gray-900 mb-3">{n.title}</h2>
+                    <p className="text-xs text-gray-500 mb-1">Created By:</p>
+                    <div className="flex items-center gap-2">
+                      <BsPersonCircle size={28} className="text-gray-500 shrink-0" />
+                      <div>
+                        <p className="text-sm font-medium text-gray-800">{n.owner}</p>
+                        <p className="text-xs text-gray-500">@{n.username}</p>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="flex border-t border-gray-200">
+                    <button className="flex-1 py-2 text-sm text-gray-600 hover:bg-gray-50 transition-colors border-r border-gray-200">
+                      Share
+                    </button>
+                    <Link
+                      href={`/calendar/${n.id}`}
+                      className="flex-1 py-2 text-sm text-center text-gray-600 hover:bg-gray-50 transition-colors"
+                    >
+                      View
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
