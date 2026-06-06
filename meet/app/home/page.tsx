@@ -2,37 +2,53 @@
 import Link from "next/link";
 import Header from "../components/Header";
 import { BsPersonCircle } from "react-icons/bs";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
-export const calendarEvents = [
-    {
-        id: 1,
-        title: "Thursday Hangouts",
-        owner: "Audrey Phung",
-        username: "audreyp4",
-    },
-    {
-        id: 2,
-        title: "Weekly Meetings w/ Project Team",
-        owner: "Anver Chou",
-        username: "anverc",
-    },
-    {
-        id: 3,
-        title: "INF 124 Group",
-        owner: "Nicole Saengsouvanna",
-        username: "saengson",
-    },
-    {
-        id: 4,
-        title: "Study Sessions",
-        owner: "Ethan Votran",
-        username: "evotran",
-    },
+interface CalendarCard {
+  id: string;
+  title: string;
+  owner: string;
+  username: string;
+}
+
+const HARDCODED_CALENDARS: CalendarCard[] = [
+  { id: "static-1", title: "Thursday Hangouts", owner: "Audrey Phung", username: "audreyp4" },
+  { id: "static-2", title: "Weekly Meetings w/ Project Team", owner: "Anver Chou", username: "anverc" },
+  { id: "static-3", title: "INF 124 Group", owner: "Nicole Saengsouvanna", username: "saengson" },
+  { id: "static-4", title: "Study Sessions", owner: "Ethan Votran", username: "evotran" },
 ];
 
 export default function HomePage() {
-  const [calendars, setCalendars] = useState(calendarEvents);
+  const [dbCalendars, setDbCalendars] = useState<CalendarCard[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  const fetchGroups = async () => {
+    try {
+      const res = await fetch("/api/calendar-groups");
+      if (!res.ok) throw new Error();
+      const { groups } = await res.json();
+      const mapped: CalendarCard[] = groups.map((g: { _id: string; name: string; owner: string }) => ({
+        id: g._id,
+        title: g.name,
+        owner: g.owner,
+        username: g.owner,
+      }));
+      setDbCalendars(mapped);
+    } catch {
+      // keep whatever was last fetched
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchGroups();
+    const interval = setInterval(fetchGroups, 5000);
+    return () => clearInterval(interval);
+  }, []);
+
+  const allCalendars = [...HARDCODED_CALENDARS, ...dbCalendars];
+
   return (
     <div className="flex flex-col min-h-screen bg-white">
       <Header />
@@ -43,14 +59,14 @@ export default function HomePage() {
               <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
                 Calendars
               </h1>
-              <Link href="/create-calendar"className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 text-sm font-medium text-gray-700 rounded-full transition-colors">
+              <Link href="/create-calendar" className="flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 border border-gray-300 text-sm font-medium text-gray-700 rounded-full transition-colors">
                 <span className="text-lg leading-none">+</span>
                 New Calendar
               </Link>
             </div>
 
             <div className="grid grid-cols-4 gap-4">
-              {calendars.map((n) => (
+              {allCalendars.map((n) => (
                 <div key={n.id} className="flex flex-col border border-gray-200 rounded-xl overflow-hidden">
                   <div className="p-4 flex-1">
                     <h2 className="text-sm font-semibold text-gray-900 mb-3">{n.title}</h2>
@@ -77,6 +93,10 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
+
+            {loading && dbCalendars.length === 0 && (
+              <p className="mt-4 text-sm text-gray-400">Loading new calendars...</p>
+            )}
           </div>
         </div>
       </div>
